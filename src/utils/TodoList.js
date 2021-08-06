@@ -9,11 +9,13 @@ export default class TodoList {
 
   load() {
     const data = window.localStorage.getItem(storagekey);
+
     if (data != null) {
       this.items = JSON.parse(data);
     } else {
       this.items = [];
     }
+    
     this.maxId = _.isEmpty(this.items) ? 0 : _.maxBy(this.items, "id").id;
   }
 
@@ -26,13 +28,15 @@ export default class TodoList {
     return this.maxId;
   }
 
-  add(name) {
+  add(name, tabID) {
     const item = {
       id: this.newId(),
       name,
+      tabID,
       completed: false,
       createdAt: Date.now(),
     };
+
     this.items.unshift(item);
     this.save();
   }

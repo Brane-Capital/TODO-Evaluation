@@ -3,9 +3,11 @@ import styled from "styled-components";
 import { KeyCode } from "./utils/constants";
 import { getHashPath } from "./utils/pageAddress";
 import Todos from "./utils/TodoList";
+import Tabs from "./utils/Tabs";
 import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
+import TabGroup from "./components/TabGroup";
 
 const Page = styled.div`
   .info {
@@ -46,7 +48,7 @@ const TodoApp = styled.section`
 
   label.indicator {
     position: absolute;
-    top: 14px;
+    top: 58px;
     left: -8px;
     font-size: 22px;
     color: #e6e6e6;
@@ -103,15 +105,17 @@ class App extends React.Component {
     newTodo: "",
     filter: getHashPath() || "active",
     items: [],
+    selectedTabID: 0
   };
 
   todos = new Todos();
+  tabs = new Tabs();
 
-  loadItems(filter) {
+  loadItems(filter, id) {
     if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.todos.filter(this.state.filter) });
+      this.setState({ items: this.todos.filter(this.state.filter).filter((i) => (i.tabID === id || id === 0)), selectedTabID: id });
     } else {
-      this.setState({ filter, items: this.todos.filter(filter) });
+      this.setState({ filter, items: this.todos.filter(filter).filter((i) => (i.tabID === id || id === 0)), selectedTabID: id });
     }
   }
 
@@ -123,12 +127,12 @@ class App extends React.Component {
     if (event.keyCode == KeyCode.Enter) {
       event.preventDefault();
       var title = this.state.newTodo.trim();
+
       if (title) {
-        this.todos.add(title);
+        this.todos.add(title, this.state.selectedTabID);
         this.setState({ newTodo: "" });
-        const filter =
-          this.state.filter == "completed" ? "active" : this.state.filter;
-        this.loadItems(filter);
+        const filter = this.state.filter == "completed" ? "active" : this.state.filter;
+        this.loadItems(filter, this.state.selectedTabID);
       }
     }
   };
@@ -136,30 +140,58 @@ class App extends React.Component {
   toggle = todo => {
     return () => {
       this.todos.toggle(todo);
-      this.loadItems();
+      this.loadItems(null, this.state.selectedTabID);
     };
   };
 
   update = todo => {
     return newName => {
       this.todos.rename(todo.id, newName);
-      this.loadItems();
+      this.loadItems(null, this.state.selectedTabID);
     };
   };
 
   destroy = todo => {
     return () => {
       this.todos.delete(todo);
-      this.loadItems();
+      this.loadItems(null, this.state.selectedTabID);
     };
   };
 
+  handleDestroyTab = (id) => {
+    this.tabs.delete(id);
+
+    this.state.items.forEach(i => {
+      if (i.tabID === id) {
+        this.todos.delete(i);
+      }
+    });
+    
+    this.loadItems(null, this.tabs.tabs[this.tabs.tabs.length - 1].id);
+  }
+
+  handleTabUpdate = (id) => {
+    const filter = this.state.filter == "completed" ? "active" : this.state.filter;
+    this.loadItems(filter, id);
+  }
+
+  handleTabAdd = () => {
+    this.tabs.add();
+    const filter = this.state.filter == "completed" ? "active" : this.state.filter;
+    this.loadItems(filter, this.tabs.tabs[this.tabs.tabs.length - 1].id);
+  }
+
+  handleTabRename = (id, name) => {
+    this.tabs.update(id, name.trim());
+    this.setState({ tabs: this.tabs.tabs });
+  }
+
   hashchange = () => {
-    this.loadItems(getHashPath());
+    this.loadItems(getHashPath(), this.state.selectedTabID);
   };
 
   componentDidMount() {
-    this.loadItems();
+    this.loadItems(null, 0);
     window.addEventListener("hashchange", this.hashchange);
   }
 
@@ -174,14 +206,24 @@ class App extends React.Component {
         <GlobalStyle />
         <Title>todos</Title>
         <TodoApp>
-          <label className="indicator">❯</label>
-          <Input
-            placeholder="What needs to be done?"
-            value={newTodo}
-            onChange={this.inputText}
-            onKeyDown={this.newTodoKeyDown}
-            autoFocus={true}
+          <TabGroup
+            tabs={this.tabs.tabs}
+            onDestroy={this.handleDestroyTab}
+            selectedTabID={this.state.selectedTabID}
+            handleChange={this.handleTabUpdate}
+            handleTabAdd={this.handleTabAdd}
+            handleTabRename={this.handleTabRename}
           />
+          <div style={{borderTop: '1px solid #e6e6e6' }}>
+            <label className="indicator">❯</label>
+            <Input
+              placeholder="What needs to be done?"
+              value={newTodo}
+              onChange={this.inputText}
+              onKeyDown={this.newTodoKeyDown}
+              autoFocus={true}
+            />
+          </div>
           <TodoList>
             {items.map((todo, index) => (
               <TodoItem

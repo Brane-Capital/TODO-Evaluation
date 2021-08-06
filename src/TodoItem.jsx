@@ -96,6 +96,7 @@ class TodoItem extends React.Component {
   render() {
     const { todo, filter, onToggle, onDestroy } = this.props;
     const { editText, editting } = this.state;
+    
     return editting ? (
       <li>
         <Input
