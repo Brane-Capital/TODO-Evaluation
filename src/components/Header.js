@@ -67,7 +67,7 @@ export default class App extends React.Component {
         const name =event.target.value
 
         if(this.props.onDelete){
-            this.props.onDelete(event, name)
+            this.props.onDelete(event, name, this.props.id)
         }
     }
 
@@ -75,9 +75,9 @@ export default class App extends React.Component {
 
         return (
         <div> 
-      <form>
+      <form onSubmit={this.onDelete}>
       <input type="text" name="name" onChange={this.onChange} onSubmit={this.onChange} />
-      <Button > </Button>
+      <input type="submit" value="Submit" />
        </form>
     </div>)
     }
