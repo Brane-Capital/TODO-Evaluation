@@ -123,6 +123,15 @@ class App extends React.Component {
     }
   }
 
+
+  loadItemsByHeaderId(filter){
+    if (filter == null || filter == this.state.filter) {
+      this.setState({ items: this.todos.filterHeaderId(this.state.currentHeaderId) });
+    } else {
+      this.setState({ filter, items: this.todos.filterHeaderId(filter) });
+    }
+  }
+
   inputText = event => {
     this.setState({ newTodo: event.target.value });
   };
