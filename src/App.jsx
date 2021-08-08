@@ -105,7 +105,10 @@ class App extends React.Component {
     newTodo: "",
     filter: getHashPath() || "active",
     items: [],
-    headers: [],
+    headers: [{
+      id: 0,
+      name: "All"
+    }],
     currentHeaderId: 0 
   };
 
@@ -129,9 +132,9 @@ class App extends React.Component {
 
   loadItemsByHeaderId(filter){
     if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.todos.filterHeaderId(this.state.currentHeaderId) });
+      this.setState({ items: this.todos.filterHeaderId(this.state.filter , this.state.currentHeaderId) });
     } else {
-      this.setState({ filter, items: this.todos.filterHeaderId(filter) });
+      this.setState({ filter, items: this.todos.filterHeaderId(filter, this.state.currentHeaderId) });
     }
   }
 
@@ -218,7 +221,21 @@ class App extends React.Component {
   deleteHeader(event, name, id ){
 
        let {headers}=this.state
-       headers = headers.splice(id, 1)
+
+       let count = 0 
+       let count1=-1
+
+
+       headers.map(header=>{
+         if(header.id == id ){
+            count1=count
+         }
+         count++
+       })
+       headers.splice(count1, 1)
+       console.log("delete headers: " , headers )
+
+       
        this.setState({
          headers: headers
        })
@@ -263,7 +280,11 @@ class App extends React.Component {
 
          headers.map((header)=>{
 
-           return (<Header  id={header.id} name={header.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />)
+           return (
+           <div>
+           <Header  id={header.id} name={header.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />
+           </div>
+           )
          })
           
         }

@@ -73,8 +73,16 @@ export default class TodoList {
     }
   }
 
-  filterHeaderId(headerId){
-    return this.items.filter(item => item.headerId == headerId);
+  filterHeaderId(status, headerId){
+    switch (status) {
+      case "active":
+        return this.items.filter(item => item.completed == false && item.headerId == headerId);
+      case "completed":
+        return this.items.filter(item => item.completed == true && item.headerId == headerId);
+      case "all":
+      default:
+        return this.items;
+    }
  }
 
 }
