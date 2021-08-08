@@ -94,7 +94,7 @@ class TodoItem extends React.Component {
   };
 
   render() {
-    const { todo, filter, onToggle, onDestroy } = this.props;
+    const { todo, filter, onToggle, onDestroy, header} = this.props;
     const { editText, editting } = this.state;
     return editting ? (
       <li>
@@ -112,7 +112,7 @@ class TodoItem extends React.Component {
         <Row grow={1} space="between" valign="baseline">
           <label
             className={
-              todo.completed && filter != "completed" ? "completed" : ""
+               header == todo.headerId && todo.completed && filter != "completed" ? "completed" : ""
             }
             onDoubleClick={this.intoEdit}
           >
@@ -120,7 +120,7 @@ class TodoItem extends React.Component {
           </label>
           <label className="time">
             {format(
-              todo.completed && filter == "completed"
+              todo.completed && filter == "completed" && header == todo.headerId
                 ? todo.completedAt
                 : todo.createdAt,
               "yyyy-MM-dd HH:mm"

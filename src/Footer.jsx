@@ -29,8 +29,8 @@ const Links = styled(Row)`
   }
 `;
 
-function Footer({ filter, itemCount }) {
-  const selected = self => (self == filter ? "selected" : "");
+function Footer({ filter, header , itemCount }) {
+  const selected = self => (self == filter  ? "selected" : "");
   const words = { all: "in total", active: "left", completed: "finished" };
   return (
     <StyledFooter as="footer" space="between" valign="middle">

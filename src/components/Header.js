@@ -100,7 +100,7 @@ export default class App extends React.Component {
         return (
         <div> 
       <form onSubmit={this.onDelete}>
-      <input type="text" name="name" value={this.state.name} onClick={this.onClick} onChange={this.onChange} onSubmit={this.onChange} />
+      <input type="text" name="name" value={`${this.state.name} ${this.props.id}`} onClick={this.onClick} onChange={this.onChange} onSubmit={this.onChange} />
       <input type="submit" value="Delete" hidden={visibility} />
        </form>
     </div>)

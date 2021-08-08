@@ -279,7 +279,7 @@ class App extends React.Component {
 
 
   render() {
-    const { newTodo, filter, items, headers} = this.state;
+    const { newTodo, filter, items, headers, currentHeaderId} = this.state;
 
 
     const currentHeader=this.state.headers.filter((item) => item.id == this.state.currentHeaderId)
@@ -296,7 +296,7 @@ class App extends React.Component {
         <TodoApp>
 
           <label className="indicator">❯</label>
-          <Header  id={currentHeader.id} name={currentHeader.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />
+          <Header  id={this.state.currentHeaderId} name={currentHeader.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />
 
           <Input
             placeholder="What needs to be done?"
@@ -310,6 +310,7 @@ class App extends React.Component {
               <TodoItem
                 key={index}
                 todo={todo}
+                header={currentHeaderId}
                 filter={filter}
                 onToggle={this.toggle(todo)}
                 onUpdate={this.update(todo)}
@@ -317,7 +318,7 @@ class App extends React.Component {
               />
             ))}
           </TodoList>
-          <Footer filter={filter} itemCount={items.length} />
+          <Footer filter={filter} header={currentHeaderId} itemCount={items.length} />
         </TodoApp>
         <footer className="info">
           <p>Double-click to edit a todo</p>
