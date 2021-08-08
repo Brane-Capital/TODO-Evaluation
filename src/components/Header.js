@@ -10,6 +10,7 @@ export default class App extends React.Component {
         super(props)
         let {name} = this.props;
 
+
         
         if(!name ){
             name = "New List"
@@ -17,32 +18,30 @@ export default class App extends React.Component {
 
         this.state={
             name : name,
+           
         }
 
        
 
-        this.onChange.bind(this)
+        this.onChange =this.onChange.bind(this)
 
     }
 
     onChange(event){
+        const name =event.target.value
 
 
         console.log("onchange: ", event.target.value)
-     
-       const name =event.target.value
+        if(this.props.onClick){
+
+            
+            this.props.onClick(event, name)
+        }
         this.setState({
             name: name
         })
 
-
-        console.log("===============================")
-        if(this.props.onClick){
-
-            console.log("onclick recieved")
-            this.props.onClick(name)
-        }
-        console.log("===============================")
+       
 
 
     }

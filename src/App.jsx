@@ -214,11 +214,13 @@ class App extends React.Component {
    constructor(props){
         super(props)
 
-        this.onClick.bind(this, "")
+        this.onClick=this.onClick.bind(this, "")
    }
 
-   onClick(event, name){
-    console.log( `Hurray : ${name}`)
+   onClick(event,  name){
+    console.log( `Hurray : ${event}`)
+    console.log(`name : ${name.target.value}`)
+
    }
 
 
