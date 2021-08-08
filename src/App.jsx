@@ -186,6 +186,19 @@ class App extends React.Component {
       
   }
 
+
+  deleteHeader(event, name, id ){
+
+       let {headers}=this.state
+       headers = headers.splice(id, 1)
+       this.setState({
+         headers: headers
+       })
+
+       // delete all the tods with the ids too 
+
+  }
+
   addHeader(event, name){
     let {headers} =this.state
     let curId= (headers.length -1)
@@ -209,7 +222,6 @@ class App extends React.Component {
 
          headers.map((header)=>{
 
-          console.log("header:", header.name)
            return (<Header  id={header.id} onClick={this.updateHeader} onDelete={this.onDelete} />)
          })
           

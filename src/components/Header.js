@@ -34,9 +34,7 @@ export default class App extends React.Component {
 
         this.state={
             name : name,
-        }
-
-       
+        }       
 
         this.onChange=this.onChange.bind(this)
 
@@ -79,6 +77,7 @@ export default class App extends React.Component {
         <div> 
       <form>
       <input type="text" name="name" onChange={this.onChange} onSubmit={this.onChange} />
+      <Button > </Button>
        </form>
     </div>)
     }
