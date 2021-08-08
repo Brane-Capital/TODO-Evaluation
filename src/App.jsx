@@ -195,7 +195,8 @@ class App extends React.Component {
 
   updateHeader(event, name, id){
       let {headers}=this.state
-     
+      console.log("UpdateHeaderId: ", id)
+
       headers[id].name = name
       this.setState({headers: headers, currentHeaderId: id})
            
@@ -203,10 +204,10 @@ class App extends React.Component {
       
   }
 
-  updateCurrentHeader(event, id){
+  updateCurrentHeader(event, name, id){
   
 
-    console.log("current HeaderId: ", id)
+    console.log("UpdateCurrentHeaderId: ", id)
     this.setState({currentHeaderId: id})
          
        

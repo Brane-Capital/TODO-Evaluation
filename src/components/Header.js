@@ -54,7 +54,7 @@ export default class App extends React.Component {
           
        if(this.props.onChange){
 
-        this.props.onChange(event, this.props.id)
+        this.props.onChange(event, event.target.name , this.props.id)
     }
      
 
