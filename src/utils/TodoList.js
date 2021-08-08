@@ -26,13 +26,12 @@ export default class TodoList {
     return this.maxId;
   }
 
-  add(name, headerId) {
+  add(name) {
     const item = {
       id: this.newId(),
       name,
       completed: false,
       createdAt: Date.now(),
-      headerId: headerId
     };
     this.items.unshift(item);
     this.save();

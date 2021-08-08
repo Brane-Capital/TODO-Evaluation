@@ -105,7 +105,7 @@ class App extends React.Component {
     newTodo: "",
     filter: getHashPath() || "active",
     items: [],
-    headers: [{id : 0 , name: "ap1"}, {id: 1, name: "ap2"}],
+    headers: [],
     currentHeaderId: 0 
   };
 
@@ -128,7 +128,7 @@ class App extends React.Component {
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.todos.add(title, this.state.currentHeaderId);
+        this.todos.add(title);
         this.setState({ newTodo: "" });
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
@@ -181,17 +181,27 @@ class App extends React.Component {
       let {headers}=this.state
      
       headers[id].name = name
-      this.setState({headers: headers})
+      this.setState({headers: headers, currentHeaderId: id})
 
       
+  }
+
+  addHeader(event, name){
+    let {headers} =this.state
+    let curId= (headers.length -1)
+    headers.push({
+       id: curId,
+       name: name
+    })
+    this.setState({
+      headers: headers,
+      currentHeaderId: curId
+    })
   }
 
   render() {
     const { newTodo, filter, items, headers} = this.state;
 
-    console.log("items: ", items)
-
-    console.log("New Todo" ,newTodo)
     return (
       <Page>
         <GlobalStyle />
