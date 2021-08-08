@@ -205,6 +205,8 @@ class App extends React.Component {
 
   updateCurrentHeader(event, id){
   
+
+    console.log("current HeaderId: ", id)
     this.setState({currentHeaderId: id})
          
        
@@ -226,7 +228,7 @@ class App extends React.Component {
 
   addHeader(event, name){
 
-    console.log("add header event")
+  
     let {headers} =this.state
     let curId= (headers.length -1)
     if(curId < 0 ){
@@ -236,9 +238,12 @@ class App extends React.Component {
        id: curId,
        name: 'New List'
     })
+
+    console.log(" curren id 1 : ", curId)
+    console.log("headers: ", headers)
     this.setState({
       headers: headers,
-      currentHeaderId: curId
+      currentHeaderId: (headers.length - 1)
     })
   }
 
