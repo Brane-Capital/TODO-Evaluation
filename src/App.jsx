@@ -7,7 +7,7 @@ import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
 import Header from "./components/Header"
-import { Col, Grid } from "./components/FlexboxGrid";
+import { Col, Grid, Row } from "./components/FlexboxGrid";
 
 const Page = styled.div`
   .info {
@@ -100,281 +100,276 @@ const TodoList = styled.ul`
   }
 `;
 
-// class App extends React.Component {
-//   state = {
-//     newTodo: "",
-//     filter: getHashPath() || "active",
-//     items: [],
-//     headers: [{
-//       id: 0,
-//       name: "All"
-//     }],
-//     currentHeaderId: 0 
-//   };
+class App extends React.Component {
+  state = {
+    newTodo: "",
+    filter: getHashPath() || "active",
+    items: [],
+    headers: [{
+      id: 0,
+      name: "All"
+    }],
+    currentHeaderId: 0 
+  };
 
-//    constructor(props){
-//      super(props)
-//      this.addHeader=this.addHeader.bind(this)
-//      this.deleteHeader=this.deleteHeader.bind(this)
-//      this.updateHeader=this.updateHeader.bind(this)
-//      this.updateCurrentHeader=this.updateCurrentHeader.bind(this)
-//    }
-//   todos = new Todos();
+   constructor(props){
+     super(props)
+     this.addHeader=this.addHeader.bind(this)
+     this.deleteHeader=this.deleteHeader.bind(this)
+     this.updateHeader=this.updateHeader.bind(this)
+     this.updateCurrentHeader=this.updateCurrentHeader.bind(this)
+     this.loadItemsByHeaderId=this.loadItemsByHeaderId.bind(this)
+   }
+  todos = new Todos();
 
-//   loadItems(filter) {
-//     if (filter == null || filter == this.state.filter) {
-//       this.setState({ items: this.todos.filter(this.state.filter) });
-//     } else {
-//       this.setState({ filter, items: this.todos.filter(filter) });
-//     }
-//   }
-
-
-//   loadItemsByHeaderId(filter){
-//     if (filter == null || filter == this.state.filter) {
-//       this.setState({ items: this.todos.filterHeaderId(this.state.filter , this.state.currentHeaderId) });
-//     } else {
-//       this.setState({ filter, items: this.todos.filterHeaderId(filter, this.state.currentHeaderId) });
-//     }
-//   }
-
-//   inputText = event => {
-//     this.setState({ newTodo: event.target.value });
-//   };
-
-//   newTodoKeyDown = event => {
-//     if (event.keyCode == KeyCode.Enter) {
-//       event.preventDefault();
-//       var title = this.state.newTodo.trim();
-//       if (title) {
-//         this.todos.add(title);
-//         this.setState({ newTodo: "" });
-//         const filter =
-//           this.state.filter == "completed" ? "active" : this.state.filter;
-//         this.loadItems(filter);
-//       }
-//     }
-//   };
-
-//   toggle = todo => {
-//     return () => {
-//       this.todos.toggle(todo);
-//       this.loadItems();
-//     };
-//   };
-
-//   update = todo => {
-
-//     todo.headerId= this.state.currentHeaderId
-//     console.log("curentHeader ID", this.state.currentHeaderId)
-
-//     return newName => {
-
-//       this.todos.rename(todo.id, newName);
-//       this.loadItems();
-//     };
-//   };
-
-//   destroy = todo => {
-//     return () => {
-//       this.todos.delete(todo);
-//       this.loadItems();
-//     };
-//   };
-
-//   hashchange = () => {
-//     this.loadItems(getHashPath());
-//   };
-
-//   componentDidMount() {
-//     this.loadItems();
-//     window.addEventListener("hashchange", this.hashchange);
-//   }
-
-//   componentWillUnmount() {
-//     window.removeEventListener("hashchange", this.hashchange);
-//   }
+  loadItems(filter) {
+    if (filter == null || filter == this.state.filter) {
+      this.setState({ items: this.todos.filter(this.state.filter) });
+    } else {
+      this.setState({ filter, items: this.todos.filter(filter) });
+    }
+  }
 
 
-//   updateHeader(event, name, id){
-//       let {headers}=this.state
-//       console.log("UpdateHeaderId: ", id)
+  loadItemsByHeaderId(filter){
+    if (filter == null || filter == this.state.filter) {
+      this.setState({ items: this.todos.filterHeaderId(this.state.filter , this.state.currentHeaderId) });
+    } else {
+      this.setState({ filter, items: this.todos.filterHeaderId(filter, this.state.currentHeaderId) });
+    }
 
-//       headers.map(header =>{
-              //      if(header.id == id ){
-              //        header.name = name 
-              //      }
-              //  })
-//       this.setState({headers: headers, currentHeaderId: id})
+
+  }
+
+  inputText = event => {
+    this.setState({ newTodo: event.target.value });
+  };
+
+  newTodoKeyDown = event => {
+    if (event.keyCode == KeyCode.Enter) {
+      event.preventDefault();
+      var title = this.state.newTodo.trim();
+      if (title) {
+        this.todos.add(title, this.state.currentHeaderId);
+        this.setState({ newTodo: "" });
+        const filter =
+          this.state.filter == "completed" ? "active" : this.state.filter;
+        //this.loadItems(filter);
+        this.loadItemsByHeaderId(filter)
+      this.state.items.map(it=>{
+        console.log("Id: " , it.id," HeaderId : " ,it.headerId)}
+        )
+      }
+    }
+  };
+
+  toggle = todo => {
+    return () => {
+      this.todos.toggle(todo);
+      //this.loadItems();
+      this.loadItemsByHeaderId()
+    };
+  };
+
+  update = todo => {
+
+    todo.headerId= this.state.currentHeaderId
+
+    return newName => {
+
+      this.todos.rename(todo.id, newName);
+      this.loadItems();
+    };
+  };
+
+  destroy = todo => {
+    return () => {
+      this.todos.delete(todo);
+      this.loadItems();
+    };
+  };
+
+  hashchange = () => {
+    //this.loadItems(getHashPath());
+    this.loadItemsByHeaderId(getHashPath());
+  };
+
+  componentDidMount() {
+    //this.loadItems();
+    this.loadItemsByHeaderId()
+    window.addEventListener("hashchange", this.hashchange);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("hashchange", this.hashchange);
+  }
+
+
+  updateHeader(event, name, id){
+      let {headers}=this.state
+
+      headers.map(header =>{
+                   if(header.id == id ){
+                     header.name = name 
+                   }
+               })
+      this.setState({headers: headers, currentHeaderId: id})
            
          
       
-//   }
+  }
 
-//   updateCurrentHeader(event, name, id){
+  updateCurrentHeader(event, name, id){
   
 
-//     console.log("UpdateCurrentHeaderId: ", id)
-//     this.setState({currentHeaderId: id})
+    console.log("UpdateCurrentHeaderId: ", id)
+    this.setState({currentHeaderId: id})
          
        
     
-// }
+}
 
 
-//   deleteHeader(event, name, id ){
+  deleteHeader(event, name, id ){
 
-//        let {headers}=this.state
+       let {headers}=this.state
 
-//        let count = 0 
-//        let count1=-1
+       let count = 0 
+       let count1=-1
 
 
-//        headers.map(header=>{
-//          if(header.id == id ){
-//             count1=count
-//          }
-//          count++
-//        })
-//        headers.splice(count1, 1)
-//        console.log("delete headers: " , headers )
+       headers.map(header=>{
+         if(header.id == id ){
+            count1=count
+         }
+         count++
+       })
+       headers.splice(count1, 1)
+       console.log("delete headers: " , headers )
 
        
-//        this.setState({
-//          headers: headers
-//        })
+       this.setState({
+         headers: headers
+       })
 
-//        // delete all the tods with the ids too 
-
-//   }
-
-//   addHeader(event, name){
-
-  
-//     let {headers} =this.state
-//     let curId= (headers.length)
-//     if(curId < 0 ){
-//       curId =0
-//     }
-//     headers.push({
-//        id: curId,
-//        name: 'New List'
-//     })
-
-//     console.log(" curren id 1 : ", curId)
-//     console.log("headers: ", headers)
-//     this.setState({
-//       headers: headers,
-//       currentHeaderId: (headers.length - 1)
-//     })
-//   }
-
-
-
-
-//   render() {
-//     const { newTodo, filter, items, headers} = this.state;
-
-//     return (
-//       <Page>
-//         <GlobalStyle />
-
-//           <input type="submit" value="add" onClick={this.addHeader} ></input>
-//         { 
-
-//         ()=>{
-//         return (
-//          <Grid> 
-//          headers.map((header)=>{
-
-          
-//            <div>
-//            <Header  id={header.id} name={header.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />
-//            <Header  id={header.id} name={header.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />
-
-//            </div>
-           
-
-           
-          
-//          })
-//          </Grid>)
-//         }
-          
-//         }
-        
-      
-//         <Title>todos</Title>
-//         <TodoApp>
-//           <label className="indicator">❯</label>
-//           <Input
-//             placeholder="What needs to be done?"
-//             value={newTodo}
-//             onChange={this.inputText}
-//             onKeyDown={this.newTodoKeyDown}
-//             autoFocus={true}
-//           />
-//           <TodoList>
-//             {items.map((todo, index) => (
-//               <TodoItem
-//                 key={index}
-//                 todo={todo}
-//                 filter={filter}
-//                 onToggle={this.toggle(todo)}
-//                 onUpdate={this.update(todo)}
-//                 onDestroy={this.destroy(todo)}
-//               />
-//             ))}
-//           </TodoList>
-//           <Footer filter={filter} itemCount={items.length} />
-//         </TodoApp>
-//         <footer className="info">
-//           <p>Double-click to edit a todo</p>
-//           <p>
-//             An adaptation of <a href="http://todomvc.com">TodoMVC</a>
-//           </p>
-//         </footer>
-//       </Page>
-//     );
-//   }
-// }
-
-
-class App extends React.Component {
-
-   constructor(props){
-        super(props)
-
-        this.onClickHeader=this.onClickHeader.bind(this, "")
-        this.onDeleteHeader=this.onDeleteHeader.bind(this)
-   }
-
-   onClickHeader(event,  name){
-    console.log(`name : ${name.target.value}`)
-
-   }
-
-   onDeleteHeader(event, name ){
-
-
-    console.log(`delete : ${name.target.value}`)
-   }
-
-  
-
-  render(){ 
-    return (
-    <Grid> 
-       <Col><Header   onClick={this.onClickHeader} onDelete={this.onDeleteHeader} /></Col> 
-       <Col>  <Header   onClick={this.onClickHeader} onDelete={this.onDeleteHeader} /></Col> 
-
-       <Col>  <Header   onClick={this.onClickHeader} onDelete={this.onDeleteHeader} /></Col> 
-
-     </Grid>
-   
-  );
+       // delete all the tods with the ids too 
 
   }
+
+  addHeader(event, name){
+
+  
+    let {headers} =this.state
+    let curId= (headers.length)
+    if(curId < 0 ){
+      curId =0
+    }
+    headers.push({
+       id: curId,
+       name: 'New List'
+    })
+
+    
+    this.setState({
+      headers: headers,
+      currentHeaderId: (headers.length - 1)
+    })
+  }
+
+   
+
+
+   
+
+
+  render() {
+    const { newTodo, filter, items, headers} = this.state;
+
+
+    const currentHeader=this.state.headers.filter((item) => item.id == this.state.currentHeaderId)
+
+    return (
+      <Page>
+        <GlobalStyle />
+
+          <input type="submit" value="add" onClick={this.addHeader} ></input>
+           
+
+
+        <Title>todos</Title>
+        <TodoApp>
+
+          <label className="indicator">❯</label>
+          <Header  id={currentHeader.id} name={currentHeader.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />
+
+          <Input
+            placeholder="What needs to be done?"
+            value={newTodo}
+            onChange={this.inputText}
+            onKeyDown={this.newTodoKeyDown}
+            autoFocus={true}
+          />
+          <TodoList>
+            {items.map((todo, index) => (
+              <TodoItem
+                key={index}
+                todo={todo}
+                filter={filter}
+                onToggle={this.toggle(todo)}
+                onUpdate={this.update(todo)}
+                onDestroy={this.destroy(todo)}
+              />
+            ))}
+          </TodoList>
+          <Footer filter={filter} itemCount={items.length} />
+        </TodoApp>
+        <footer className="info">
+          <p>Double-click to edit a todo</p>
+          <p>
+            An adaptation of <a href="http://todomvc.com">TodoMVC</a>
+          </p>
+        </footer>
+      </Page>
+    );
+  }
 }
+
+
+// class App extends React.Component {
+
+//    constructor(props){
+//         super(props)
+
+//         this.onClickHeader=this.onClickHeader.bind(this, "")
+//         this.onDeleteHeader=this.onDeleteHeader.bind(this)
+//    }
+
+//    onClickHeader(event,  name){
+//     console.log(`name : ${name.target.value}`)
+
+//    }
+
+//    onDeleteHeader(event, name ){
+
+
+//     console.log(`delete : ${name.target.value}`)
+//    }
+
+  
+
+//   render(){ 
+//     return (
+//     <Grid> 
+//        <Row><Header   onClick={this.onClickHeader} onDelete={this.onDeleteHeader} /></Row> 
+//        <Row>  <Header   onClick={this.onClickHeader} onDelete={this.onDeleteHeader} /></Row> 
+
+//        <Row>  <Header   onClick={this.onClickHeader} onDelete={this.onDeleteHeader} /></Row> 
+
+//      </Grid>
+   
+//   );
+
+//   }
+// }
 
 export default App;

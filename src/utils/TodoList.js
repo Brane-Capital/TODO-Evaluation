@@ -26,13 +26,16 @@ export default class TodoList {
     return this.maxId;
   }
 
-  add(name) {
+  add(name, headerId) {
     const item = {
       id: this.newId(),
       name,
       completed: false,
       createdAt: Date.now(),
+      headerId: headerId
     };
+
+    
     this.items.unshift(item);
     this.save();
   }
@@ -76,9 +79,9 @@ export default class TodoList {
   filterHeaderId(status, headerId){
     switch (status) {
       case "active":
-        return this.items.filter(item => item.completed == false && item.headerId == headerId);
+        return this.items.filter(item => { return (item.completed == false && item.headerId == headerId)} );
       case "completed":
-        return this.items.filter(item => item.completed == true && item.headerId == headerId);
+        return this.items.filter( item => { return (item.completed == true && item.headerId == headerId)});
       case "all":
       default:
         return this.items;
