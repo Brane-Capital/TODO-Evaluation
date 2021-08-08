@@ -1,6 +1,7 @@
 import { set } from "lodash";
 import React from "react";
 import styled from "styled-components";
+const DEFAULT_NAME="New List"
 const Div1 = styled.div`
 margin: 0;
 padding: 0;
@@ -29,7 +30,7 @@ export default class App extends React.Component {
 
         
         if(!name ){
-            name = "New List"
+            name = DEFAULT_NAME
         } 
 
         this.state={
@@ -43,13 +44,18 @@ export default class App extends React.Component {
 
     onChange(event){
 
-        const name =event.target.value
+        let name =event.target.value
 
         console.log("onchange: ", event.target.value)
+
+
+        if(!(name == "")){
+            this.setState({
+                name: name,
+            })
+        }
      
-        this.setState({
-            name: name,
-        })
+       
 
 
        

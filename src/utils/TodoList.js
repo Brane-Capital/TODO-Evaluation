@@ -72,4 +72,12 @@ export default class TodoList {
         return this.items;
     }
   }
+
+  filterHeaderId(headerId){
+    return this.items.filter(item => item.headerId == headerId);
+ }
+
 }
+
+
+  
