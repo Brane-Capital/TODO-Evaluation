@@ -39,14 +39,32 @@ export default class App extends React.Component {
         }       
 
         this.onChange=this.onChange.bind(this)
+        this.onClick=this.onClick.bind(this)
 
+    }
+
+    onClick(event){
+
+
+       this.setState({
+           visibility: !this.state.visibility
+       })
+
+
+          
+       if(this.props.onChange){
+
+        this.props.onChange(event, this.props.id)
+    }
+     
+
+       
     }
 
     onChange(event){
 
         let name =event.target.value
 
-        console.log("onchange: ", event.target.value)
 
 
         if(!(name == "")){
@@ -59,9 +77,8 @@ export default class App extends React.Component {
 
 
        
-        if(this.props.onClick){
+        if(this.props.onChange){
 
-            console.log("onclick recieved")
             this.props.onClick(event, name, this.props.id)
         }
 
@@ -83,7 +100,7 @@ export default class App extends React.Component {
         return (
         <div> 
       <form onSubmit={this.onDelete}>
-      <input type="text" name="name" value={this.state.name} onClick={(e)=> {this.setState({visibility: !this.state.visibility})}} onChange={this.onChange} onSubmit={this.onChange} />
+      <input type="text" name="name" value={this.state.name} onClick={this.onClick} onChange={this.onChange} onSubmit={this.onChange} />
       <input type="submit" value="Submit" hidden={visibility} />
        </form>
     </div>)

@@ -114,6 +114,7 @@ class App extends React.Component {
      this.addHeader=this.addHeader.bind(this)
      this.deleteHeader=this.deleteHeader.bind(this)
      this.updateHeader=this.updateHeader.bind(this)
+     this.updateCurrentHeader=this.updateCurrentHeader.bind(this)
    }
   todos = new Todos();
 
@@ -162,7 +163,7 @@ class App extends React.Component {
   update = todo => {
 
     todo.headerId= this.state.currentHeaderId
-    console.log("Im here update", todo)
+    console.log("curentHeader ID", this.state.currentHeaderId)
 
     return newName => {
 
@@ -202,6 +203,14 @@ class App extends React.Component {
       
   }
 
+  updateCurrentHeader(event, id){
+  
+    this.setState({currentHeaderId: id})
+         
+       
+    
+}
+
 
   deleteHeader(event, name, id ){
 
@@ -220,6 +229,9 @@ class App extends React.Component {
     console.log("add header event")
     let {headers} =this.state
     let curId= (headers.length -1)
+    if(curId < 0 ){
+      curId =0
+    }
     headers.push({
        id: curId,
        name: 'New List'
@@ -245,7 +257,7 @@ class App extends React.Component {
 
          headers.map((header)=>{
 
-           return (<Header  id={header.id} name={header.name} onClick={this.updateHeader} onDelete={this.onDelete} />)
+           return (<Header  id={header.id} name={header.name} onClick={this.updateCurrentHeader} onChange={this.updateHeader} onDelete={this.onDelete} />)
          })
           
         }
