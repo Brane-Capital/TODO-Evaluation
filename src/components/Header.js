@@ -77,7 +77,7 @@ export default class App extends React.Component {
         return (
         <div> 
       <form onSubmit={this.onDelete}>
-      <input type="text" name="name" onClick={(e)=> {this.setState({visibility: !this.state.visibility})}} onChange={this.onChange} onSubmit={this.onChange} />
+      <input type="text" name="name" value={this.state.name} onClick={(e)=> {this.setState({visibility: !this.state.visibility})}} onChange={this.onChange} onSubmit={this.onChange} />
       <input type="submit" value="Submit" hidden={visibility} />
        </form>
     </div>)
