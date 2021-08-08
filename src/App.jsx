@@ -112,6 +112,8 @@ class App extends React.Component {
    constructor(props){
      super(props)
      this.addHeader=this.addHeader.bind(this)
+     this.deleteHeader=this.deleteHeader.bind(this)
+     this.updateHeader=this.updateHeader.bind(this)
    }
   todos = new Todos();
 
