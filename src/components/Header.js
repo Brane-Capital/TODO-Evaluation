@@ -9,14 +9,8 @@ export default class App extends React.Component {
     constructor(props){
         super(props)
         let {name} = this.props;
-        let {onClick}=this.props;
 
-        if(!onClick){
-
-            onClick=function(e){
-                return e.target.value
-            }
-        }
+        
         if(!name ){
             name = "New List"
         } 
@@ -25,7 +19,8 @@ export default class App extends React.Component {
             name : name,
         }
 
-        this.onSumbit.bind(this)
+       
+
         this.onChange.bind(this)
 
     }
@@ -34,28 +29,32 @@ export default class App extends React.Component {
 
 
         console.log("onchange: ", event.target.value)
-       const {onClick}=this.props
+     
        const name =event.target.value
         this.setState({
             name: name
         })
 
-        if(onClick){
+
+        console.log("===============================")
+        if(this.props.onClick){
 
             console.log("onclick recieved")
-            onClick.bind(this,name)
+            this.props.onClick(name)
         }
+        console.log("===============================")
+
 
     }
      
-    onSumbit(event){
+   
 
-        this.setState({name: event.target.value});
-        this.onClick(event.target.value)
+    onDelete(event){
+
+        this.props.onDelete(this.state.name)
     }
 
     render(){
-      let {name }=this.state
 
         return (
         <div> 

@@ -209,13 +209,28 @@ const TodoList = styled.ul`
 // }
 
 
-function App() {
-  return (
+class App extends React.Component {
+
+   constructor(props){
+        super(props)
+
+        this.onClick.bind(this, "")
+   }
+
+   onClick(event, name){
+    console.log( `Hurray : ${name}`)
+   }
+
+
+  render(){ 
+    return (
     <div> 
-     <Header   onClick={(name)=>{ console.log( `Hurray : ${name}`)}}/>
+     <Header   onClick={this.onClick}/>
      </div>
    
   );
+
+  }
 }
 
 export default App;
