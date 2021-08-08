@@ -44,7 +44,7 @@ export default class App extends React.Component {
     }
 
     onClick(event){
-
+        console.log("onclick event: ", this.props.id)
 
        this.setState({
            visibility: !this.state.visibility
@@ -65,7 +65,7 @@ export default class App extends React.Component {
 
         let name =event.target.value
 
-
+       console.log("onchange event", name)
 
         if(!(name == "")){
             this.setState({

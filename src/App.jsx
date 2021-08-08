@@ -230,7 +230,7 @@ class App extends React.Component {
 
   
     let {headers} =this.state
-    let curId= (headers.length -1)
+    let curId= (headers.length)
     if(curId < 0 ){
       curId =0
     }
