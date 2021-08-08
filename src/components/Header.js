@@ -34,6 +34,7 @@ export default class App extends React.Component {
 
         this.state={
             name : name,
+            visibility: false
         }       
 
         this.onChange=this.onChange.bind(this)
@@ -47,7 +48,7 @@ export default class App extends React.Component {
         console.log("onchange: ", event.target.value)
      
         this.setState({
-            name: name
+            name: name,
         })
 
 
@@ -72,12 +73,12 @@ export default class App extends React.Component {
     }
 
     render(){
-
+      let {visibility}= this.state
         return (
         <div> 
       <form onSubmit={this.onDelete}>
-      <input type="text" name="name" onChange={this.onChange} onSubmit={this.onChange} />
-      <input type="submit" value="Submit" />
+      <input type="text" name="name" onClick={(e)=> {this.setState({visibility: !this.state.visibility})}} onChange={this.onChange} onSubmit={this.onChange} />
+      <input type="submit" value="Submit" hidden={visibility} />
        </form>
     </div>)
     }
