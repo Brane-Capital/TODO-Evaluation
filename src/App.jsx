@@ -212,7 +212,7 @@ const TodoList = styled.ul`
 function App() {
   return (
     <div> 
-  <Header/>
+     <Header   onClick={(name)=>{ console.log( `Hurray : ${name}`)}}/>
      </div>
    
   );

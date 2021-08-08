@@ -1,3 +1,4 @@
+import { set } from "lodash";
 import React from "react";
 
 
@@ -20,28 +21,46 @@ export default class App extends React.Component {
             name = "New List"
         } 
 
-        this.setState={
+        this.state={
             name : name,
-            onClick: onClick
         }
 
         this.onSumbit.bind(this)
+        this.onChange.bind(this)
+
+    }
+
+    onChange(event){
+
+
+        console.log("onchange: ", event.target.value)
+       const {onClick}=this.props
+       const name =event.target.value
+        this.setState({
+            name: name
+        })
+
+        if(onClick){
+
+            console.log("onclick recieved")
+            onClick.bind(this,name)
+        }
 
     }
      
     onSumbit(event){
 
-        console.log("Event value ", event.target.value)
         this.setState({name: event.target.value});
-        this.state.onClick(event.target.value)
+        this.onClick(event.target.value)
     }
 
     render(){
+      let {name }=this.state
 
         return (
         <div> 
       <form>
-      <input type="text" name="name"  onSubmit={this.onSumbit} />
+      <input type="text" name="name" onChange={this.onChange} onSubmit={this.onChange} />
        </form>
     </div>)
     }
