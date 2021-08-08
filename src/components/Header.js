@@ -10,8 +10,6 @@ export default class App extends React.Component {
         super(props)
         let {name} = this.props;
 
-        console.log("props:", props)
-
         
         if(!name ){
             name = "New List"
@@ -19,12 +17,11 @@ export default class App extends React.Component {
 
         this.state={
             name : name,
-           
         }
 
        
 
-        this.onChange =this.onChange.bind(this)
+        this.onChange=this.onChange.bind(this)
 
     }
 
@@ -33,18 +30,19 @@ export default class App extends React.Component {
         const name =event.target.value
 
         console.log("onchange: ", event.target.value)
-        console.log("===============================")
-        if(this.props.onClick){
-
-            console.log("onclick recieved")
-            this.props.onClick(this,name)
-        }
-        console.log("===============================")
+     
         this.setState({
             name: name
         })
 
-       
+
+        console.log("===============================")
+        if(this.props.onClick){
+
+            console.log("onclick recieved")
+            this.props.onClick(event, name)
+        }
+        console.log("===============================")
 
 
     }
@@ -53,7 +51,7 @@ export default class App extends React.Component {
 
     onDelete(event){
 
-        this.props.onDelete(this.state.name)
+        //this.props.onDelete(this.state.name)
     }
 
     render(){

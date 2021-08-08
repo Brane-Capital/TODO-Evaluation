@@ -220,7 +220,7 @@ class App extends React.Component {
 
    onClick(event,  name){
     console.log( `Hurray : ${event}`)
-    console.log(`name : ${name.target}`)
+    console.log(`name : ${name.target.value}`)
 
    }
 
