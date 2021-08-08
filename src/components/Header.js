@@ -10,6 +10,7 @@ export default class App extends React.Component {
         super(props)
         let {name} = this.props;
 
+        console.log("props:", props)
 
         
         if(!name ){
@@ -28,15 +29,17 @@ export default class App extends React.Component {
     }
 
     onChange(event){
+
         const name =event.target.value
 
-
         console.log("onchange: ", event.target.value)
+        console.log("===============================")
         if(this.props.onClick){
 
-            
-            this.props.onClick(event, name)
+            console.log("onclick recieved")
+            this.props.onClick(this,name)
         }
+        console.log("===============================")
         this.setState({
             name: name
         })

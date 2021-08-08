@@ -215,19 +215,25 @@ class App extends React.Component {
         super(props)
 
         this.onClick=this.onClick.bind(this, "")
+        this.onDelete=this.onDelete.bind(this)
    }
 
    onClick(event,  name){
     console.log( `Hurray : ${event}`)
-    console.log(`name : ${name.target.value}`)
+    console.log(`name : ${name.target}`)
 
    }
 
+   onDelete(event, name ){
+
+   }
+
+   
 
   render(){ 
     return (
     <div> 
-     <Header   onClick={this.onClick}/>
+     <Header   onClick={this.onClick} />
      </div>
    
   );
