@@ -1,6 +1,23 @@
 import { set } from "lodash";
 import React from "react";
+import styled from "styled-components";
+const Div1 = styled.div`
+margin: 0;
+padding: 0;
+border: 0;
+background: none;
+font-size: 100%;
+vertical-align: baseline;
+font-family: inherit;
+font-weight: inherit;
+color: inherit;
+-webkit-appearance: none;
+appearance: none;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+`;
 
+const StyledCon = styled(Div1)
 
 
 

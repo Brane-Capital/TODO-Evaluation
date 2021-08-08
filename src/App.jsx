@@ -128,7 +128,7 @@ class App extends React.Component {
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.todos.add(title);
+        this.todos.add(title, this.state.currentHeaderId);
         this.setState({ newTodo: "" });
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
@@ -145,7 +145,12 @@ class App extends React.Component {
   };
 
   update = todo => {
+
+    todo.headerId= this.state.currentHeaderId
+    console.log("Im here update", todo)
+
     return newName => {
+
       this.todos.rename(todo.id, newName);
       this.loadItems();
     };
@@ -185,6 +190,8 @@ class App extends React.Component {
     const { newTodo, filter, items, headers} = this.state;
 
     console.log("items: ", items)
+
+    console.log("New Todo" ,newTodo)
     return (
       <Page>
         <GlobalStyle />
