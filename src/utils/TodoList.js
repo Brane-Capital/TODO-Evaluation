@@ -26,7 +26,7 @@ export default class TodoList {
     return this.maxId;
   }
 
-  add(name, headerId) {
+  add(name,headerId) {
     const item = {
       id: this.newId(),
       name,

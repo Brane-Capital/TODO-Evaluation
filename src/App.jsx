@@ -155,7 +155,7 @@ class App extends React.Component {
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
         //this.loadItems(filter);
-        this.loadItemsByHeaderId(filter)
+      this.loadItemsByHeaderId(filter)
       this.state.items.map(it=>{
         console.log("Id: " , it.id," HeaderId : " ,it.headerId)}
         )
@@ -172,9 +172,7 @@ class App extends React.Component {
   };
 
   update = todo => {
-
-    todo.headerId= this.state.currentHeaderId
-
+    
     return newName => {
 
       this.todos.rename(todo.id, newName);
@@ -222,7 +220,6 @@ class App extends React.Component {
   updateCurrentHeader(event, name, id){
   
 
-    console.log("UpdateCurrentHeaderId: ", id)
     this.setState({currentHeaderId: id})
          
        
@@ -245,7 +242,6 @@ class App extends React.Component {
          count++
        })
        headers.splice(count1, 1)
-       console.log("delete headers: " , headers )
 
        
        this.setState({
