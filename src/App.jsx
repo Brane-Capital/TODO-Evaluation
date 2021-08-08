@@ -100,201 +100,213 @@ const TodoList = styled.ul`
   }
 `;
 
-// class App extends React.Component {
-//   state = {
-//     newTodo: "",
-//     filter: getHashPath() || "active",
-//     items: [],
-//     headers: [],
-//     currentHeaderId: 0 
-//   };
-
-//   todos = new Todos();
-
-//   loadItems(filter) {
-//     if (filter == null || filter == this.state.filter) {
-//       this.setState({ items: this.todos.filter(this.state.filter) });
-//     } else {
-//       this.setState({ filter, items: this.todos.filter(filter) });
-//     }
-//   }
-
-//   inputText = event => {
-//     this.setState({ newTodo: event.target.value });
-//   };
-
-//   newTodoKeyDown = event => {
-//     if (event.keyCode == KeyCode.Enter) {
-//       event.preventDefault();
-//       var title = this.state.newTodo.trim();
-//       if (title) {
-//         this.todos.add(title);
-//         this.setState({ newTodo: "" });
-//         const filter =
-//           this.state.filter == "completed" ? "active" : this.state.filter;
-//         this.loadItems(filter);
-//       }
-//     }
-//   };
-
-//   toggle = todo => {
-//     return () => {
-//       this.todos.toggle(todo);
-//       this.loadItems();
-//     };
-//   };
-
-//   update = todo => {
-
-//     todo.headerId= this.state.currentHeaderId
-//     console.log("Im here update", todo)
-
-//     return newName => {
-
-//       this.todos.rename(todo.id, newName);
-//       this.loadItems();
-//     };
-//   };
-
-//   destroy = todo => {
-//     return () => {
-//       this.todos.delete(todo);
-//       this.loadItems();
-//     };
-//   };
-
-//   hashchange = () => {
-//     this.loadItems(getHashPath());
-//   };
-
-//   componentDidMount() {
-//     this.loadItems();
-//     window.addEventListener("hashchange", this.hashchange);
-//   }
-
-//   componentWillUnmount() {
-//     window.removeEventListener("hashchange", this.hashchange);
-//   }
-
-
-//   updateHeader(event, name, id){
-//       let {headers}=this.state
-     
-//       headers[id].name = name
-//       this.setState({headers: headers, currentHeaderId: id})
-
-      
-//   }
-
-
-//   deleteHeader(event, name, id ){
-
-//        let {headers}=this.state
-//        headers = headers.splice(id, 1)
-//        this.setState({
-//          headers: headers
-//        })
-
-//        // delete all the tods with the ids too 
-
-//   }
-
-//   addHeader(event, name){
-//     let {headers} =this.state
-//     let curId= (headers.length -1)
-//     headers.push({
-//        id: curId,
-//        name: name
-//     })
-//     this.setState({
-//       headers: headers,
-//       currentHeaderId: curId
-//     })
-//   }
-
-//   render() {
-//     const { newTodo, filter, items, headers} = this.state;
-
-//     return (
-//       <Page>
-//         <GlobalStyle />
-//         { 
-
-//          headers.map((header)=>{
-
-//            return (<Header  id={header.id} onClick={this.updateHeader} onDelete={this.onDelete} />)
-//          })
-          
-//         }
-        
-      
-//         <Title>todos</Title>
-//         <TodoApp>
-//           <label className="indicator">❯</label>
-//           <Input
-//             placeholder="What needs to be done?"
-//             value={newTodo}
-//             onChange={this.inputText}
-//             onKeyDown={this.newTodoKeyDown}
-//             autoFocus={true}
-//           />
-//           <TodoList>
-//             {items.map((todo, index) => (
-//               <TodoItem
-//                 key={index}
-//                 todo={todo}
-//                 filter={filter}
-//                 onToggle={this.toggle(todo)}
-//                 onUpdate={this.update(todo)}
-//                 onDestroy={this.destroy(todo)}
-//               />
-//             ))}
-//           </TodoList>
-//           <Footer filter={filter} itemCount={items.length} />
-//         </TodoApp>
-//         <footer className="info">
-//           <p>Double-click to edit a todo</p>
-//           <p>
-//             An adaptation of <a href="http://todomvc.com">TodoMVC</a>
-//           </p>
-//         </footer>
-//       </Page>
-//     );
-//   }
-// }
-
-
 class App extends React.Component {
+  state = {
+    newTodo: "",
+    filter: getHashPath() || "active",
+    items: [],
+    headers: [],
+    currentHeaderId: 0 
+  };
 
    constructor(props){
-        super(props)
-
-        this.onClick=this.onClick.bind(this, "")
-        this.onDelete=this.onDelete.bind(this)
+     super(props)
+     this.addHeader=this.addHeader.bind(this)
    }
+  todos = new Todos();
 
-   onClick(event,  name){
-    console.log(`name : ${name.target.value}`)
+  loadItems(filter) {
+    if (filter == null || filter == this.state.filter) {
+      this.setState({ items: this.todos.filter(this.state.filter) });
+    } else {
+      this.setState({ filter, items: this.todos.filter(filter) });
+    }
+  }
 
-   }
+  inputText = event => {
+    this.setState({ newTodo: event.target.value });
+  };
 
-   onDelete(event, name ){
+  newTodoKeyDown = event => {
+    if (event.keyCode == KeyCode.Enter) {
+      event.preventDefault();
+      var title = this.state.newTodo.trim();
+      if (title) {
+        this.todos.add(title);
+        this.setState({ newTodo: "" });
+        const filter =
+          this.state.filter == "completed" ? "active" : this.state.filter;
+        this.loadItems(filter);
+      }
+    }
+  };
 
-    
-    console.log(`delete : ${name.target.value}`)
-   }
+  toggle = todo => {
+    return () => {
+      this.todos.toggle(todo);
+      this.loadItems();
+    };
+  };
+
+  update = todo => {
+
+    todo.headerId= this.state.currentHeaderId
+    console.log("Im here update", todo)
+
+    return newName => {
+
+      this.todos.rename(todo.id, newName);
+      this.loadItems();
+    };
+  };
+
+  destroy = todo => {
+    return () => {
+      this.todos.delete(todo);
+      this.loadItems();
+    };
+  };
+
+  hashchange = () => {
+    this.loadItems(getHashPath());
+  };
+
+  componentDidMount() {
+    this.loadItems();
+    window.addEventListener("hashchange", this.hashchange);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("hashchange", this.hashchange);
+  }
+
+
+  updateHeader(event, name, id){
+      let {headers}=this.state
+     
+      headers[id].name = name
+      this.setState({headers: headers, currentHeaderId: id})
+           
+         
+      
+  }
+
+
+  deleteHeader(event, name, id ){
+
+       let {headers}=this.state
+       headers = headers.splice(id, 1)
+       this.setState({
+         headers: headers
+       })
+
+       // delete all the tods with the ids too 
+
+  }
+
+  addHeader(event, name){
+
+    console.log("add header event")
+    let {headers} =this.state
+    let curId= (headers.length -1)
+    headers.push({
+       id: curId,
+       name: 'New List'
+    })
+    this.setState({
+      headers: headers,
+      currentHeaderId: curId
+    })
+  }
+
+
+
+
+  render() {
+    const { newTodo, filter, items, headers} = this.state;
+
+    return (
+      <Page>
+        <GlobalStyle />
+
+          <input type="submit" value="add" onClick={this.addHeader} ></input>
+        { 
+
+         headers.map((header)=>{
+
+           return (<Header  id={header.id} name={header.name} onClick={this.updateHeader} onDelete={this.onDelete} />)
+         })
+          
+        }
+        
+      
+        <Title>todos</Title>
+        <TodoApp>
+          <label className="indicator">❯</label>
+          <Input
+            placeholder="What needs to be done?"
+            value={newTodo}
+            onChange={this.inputText}
+            onKeyDown={this.newTodoKeyDown}
+            autoFocus={true}
+          />
+          <TodoList>
+            {items.map((todo, index) => (
+              <TodoItem
+                key={index}
+                todo={todo}
+                filter={filter}
+                onToggle={this.toggle(todo)}
+                onUpdate={this.update(todo)}
+                onDestroy={this.destroy(todo)}
+              />
+            ))}
+          </TodoList>
+          <Footer filter={filter} itemCount={items.length} />
+        </TodoApp>
+        <footer className="info">
+          <p>Double-click to edit a todo</p>
+          <p>
+            An adaptation of <a href="http://todomvc.com">TodoMVC</a>
+          </p>
+        </footer>
+      </Page>
+    );
+  }
+}
+
+
+// class App extends React.Component {
+
+//    constructor(props){
+//         super(props)
+
+//         this.onClick=this.onClick.bind(this, "")
+//         this.onDelete=this.onDelete.bind(this)
+//    }
+
+//    onClickHeader(event,  name){
+//     console.log(`name : ${name.target.value}`)
+
+//    }
+
+//    onDeleteHeader(event, name ){
+
+
+//     console.log(`delete : ${name.target.value}`)
+//    }
 
   
 
-  render(){ 
-    return (
-    <div> 
-       <Header   onClick={this.onClick} onDelete={this.onDelete} />
-     </div>
+//   render(){ 
+//     return (
+//     <div> 
+//        <Header   onClick={this.updateHeader} onDelete={this.deleteHeader} />
+//      </div>
    
-  );
+//   );
 
-  }
-}
+//   }
+// }
 
 export default App;
