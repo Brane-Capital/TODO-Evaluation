@@ -36,13 +36,12 @@ export default class App extends React.Component {
         })
 
 
-        console.log("===============================")
+       
         if(this.props.onClick){
 
             console.log("onclick recieved")
-            this.props.onClick(event, name)
+            this.props.onClick(event, name, this.props.id)
         }
-        console.log("===============================")
 
 
     }
@@ -50,8 +49,11 @@ export default class App extends React.Component {
    
 
     onDelete(event){
+        const name =event.target.value
 
-        //this.props.onDelete(this.state.name)
+        if(this.props.onDelete){
+            this.props.onDelete(event, name)
+        }
     }
 
     render(){

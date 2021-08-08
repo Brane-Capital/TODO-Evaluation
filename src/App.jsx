@@ -7,6 +7,7 @@ import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
 import Header from "./components/Header"
+import Checkbox  from "./components/Checkbox";
 
 const Page = styled.div`
   .info {
@@ -99,146 +100,170 @@ const TodoList = styled.ul`
   }
 `;
 
-// class App extends React.Component {
-//   state = {
-//     newTodo: "",
-//     filter: getHashPath() || "active",
-//     items: [],
-//   };
-
-//   todos = new Todos();
-
-//   loadItems(filter) {
-//     if (filter == null || filter == this.state.filter) {
-//       this.setState({ items: this.todos.filter(this.state.filter) });
-//     } else {
-//       this.setState({ filter, items: this.todos.filter(filter) });
-//     }
-//   }
-
-//   inputText = event => {
-//     this.setState({ newTodo: event.target.value });
-//   };
-
-//   newTodoKeyDown = event => {
-//     if (event.keyCode == KeyCode.Enter) {
-//       event.preventDefault();
-//       var title = this.state.newTodo.trim();
-//       if (title) {
-//         this.todos.add(title);
-//         this.setState({ newTodo: "" });
-//         const filter =
-//           this.state.filter == "completed" ? "active" : this.state.filter;
-//         this.loadItems(filter);
-//       }
-//     }
-//   };
-
-//   toggle = todo => {
-//     return () => {
-//       this.todos.toggle(todo);
-//       this.loadItems();
-//     };
-//   };
-
-//   update = todo => {
-//     return newName => {
-//       this.todos.rename(todo.id, newName);
-//       this.loadItems();
-//     };
-//   };
-
-//   destroy = todo => {
-//     return () => {
-//       this.todos.delete(todo);
-//       this.loadItems();
-//     };
-//   };
-
-//   hashchange = () => {
-//     this.loadItems(getHashPath());
-//   };
-
-//   componentDidMount() {
-//     this.loadItems();
-//     window.addEventListener("hashchange", this.hashchange);
-//   }
-
-//   componentWillUnmount() {
-//     window.removeEventListener("hashchange", this.hashchange);
-//   }
-
-//   render() {
-//     const { newTodo, filter, items } = this.state;
-//     return (
-//       <Page>
-//         <GlobalStyle />
-//         <Title>todos</Title>
-//         <TodoApp>
-//           <label className="indicator">❯</label>
-//           <Input
-//             placeholder="What needs to be done?"
-//             value={newTodo}
-//             onChange={this.inputText}
-//             onKeyDown={this.newTodoKeyDown}
-//             autoFocus={true}
-//           />
-//           <TodoList>
-//             {items.map((todo, index) => (
-//               <TodoItem
-//                 key={index}
-//                 todo={todo}
-//                 filter={filter}
-//                 onToggle={this.toggle(todo)}
-//                 onUpdate={this.update(todo)}
-//                 onDestroy={this.destroy(todo)}
-//               />
-//             ))}
-//           </TodoList>
-//           <Footer filter={filter} itemCount={items.length} />
-//         </TodoApp>
-//         <footer className="info">
-//           <p>Double-click to edit a todo</p>
-//           <p>
-//             An adaptation of <a href="http://todomvc.com">TodoMVC</a>
-//           </p>
-//         </footer>
-//       </Page>
-//     );
-//   }
-// }
-
-
 class App extends React.Component {
+  state = {
+    newTodo: "",
+    filter: getHashPath() || "active",
+    items: [],
+    headers: [{id : 0 , name: "ap1"}, {id: 1, name: "ap2"}],
+    currentHeaderId: 0 
+  };
 
-   constructor(props){
-        super(props)
+  todos = new Todos();
 
-        this.onClick=this.onClick.bind(this, "")
-        this.onDelete=this.onDelete.bind(this)
-   }
+  loadItems(filter) {
+    if (filter == null || filter == this.state.filter) {
+      this.setState({ items: this.todos.filter(this.state.filter) });
+    } else {
+      this.setState({ filter, items: this.todos.filter(filter) });
+    }
+  }
 
-   onClick(event,  name){
-    console.log( `Hurray : ${event}`)
-    console.log(`name : ${name.target.value}`)
+  inputText = event => {
+    this.setState({ newTodo: event.target.value });
+  };
 
-   }
+  newTodoKeyDown = event => {
+    if (event.keyCode == KeyCode.Enter) {
+      event.preventDefault();
+      var title = this.state.newTodo.trim();
+      if (title) {
+        this.todos.add(title);
+        this.setState({ newTodo: "" });
+        const filter =
+          this.state.filter == "completed" ? "active" : this.state.filter;
+        this.loadItems(filter);
+      }
+    }
+  };
 
-   onDelete(event, name ){
+  toggle = todo => {
+    return () => {
+      this.todos.toggle(todo);
+      this.loadItems();
+    };
+  };
 
-   }
+  update = todo => {
+    return newName => {
+      this.todos.rename(todo.id, newName);
+      this.loadItems();
+    };
+  };
 
-   
+  destroy = todo => {
+    return () => {
+      this.todos.delete(todo);
+      this.loadItems();
+    };
+  };
 
-  render(){ 
+  hashchange = () => {
+    this.loadItems(getHashPath());
+  };
+
+  componentDidMount() {
+    this.loadItems();
+    window.addEventListener("hashchange", this.hashchange);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("hashchange", this.hashchange);
+  }
+
+
+  updateHeader(event, name, id){
+      let {headers}=this.state
+     
+      headers[id].name = name
+      this.setState({headers: headers})
+
+      
+  }
+
+  render() {
+    const { newTodo, filter, items, headers} = this.state;
+
+    console.log("items: ", items)
     return (
-    <div> 
-     <Header   onClick={this.onClick} />
-     </div>
-   
-  );
+      <Page>
+        <GlobalStyle />
+        { 
 
+         headers.map((header)=>{
+
+          console.log("header:", header.name)
+           return (<Header  id={header.id} onClick={this.updateHeader} onDelete={this.onDelete} />)
+         })
+          
+        }
+        
+      
+        <Title>todos</Title>
+        <TodoApp>
+          <label className="indicator">❯</label>
+          <Input
+            placeholder="What needs to be done?"
+            value={newTodo}
+            onChange={this.inputText}
+            onKeyDown={this.newTodoKeyDown}
+            autoFocus={true}
+          />
+          <TodoList>
+            {items.map((todo, index) => (
+              <TodoItem
+                key={index}
+                todo={todo}
+                filter={filter}
+                onToggle={this.toggle(todo)}
+                onUpdate={this.update(todo)}
+                onDestroy={this.destroy(todo)}
+              />
+            ))}
+          </TodoList>
+          <Footer filter={filter} itemCount={items.length} />
+        </TodoApp>
+        <footer className="info">
+          <p>Double-click to edit a todo</p>
+          <p>
+            An adaptation of <a href="http://todomvc.com">TodoMVC</a>
+          </p>
+        </footer>
+      </Page>
+    );
   }
 }
+
+
+// class App extends React.Component {
+
+//    constructor(props){
+//         super(props)
+
+//         this.onClick=this.onClick.bind(this, "")
+//         this.onDelete=this.onDelete.bind(this)
+//    }
+
+//    onClick(event,  name){
+//     console.log(`name : ${name.target.value}`)
+
+//    }
+
+//    onDelete(event, name ){
+//     console.log(`delete : ${name.target.value}`)
+//    }
+
+  
+
+//   render(){ 
+//     return (
+//     <div> 
+//       // <Header   onClick={this.onClick} onDelete={this.onDelete} />
+//      </div>
+   
+//   );
+
+//   }
+// }
 
 export default App;
