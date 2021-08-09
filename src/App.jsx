@@ -300,7 +300,7 @@ class App extends React.Component {
           return;
         }
 
-        return todoList.filter(this.state.filter);
+        return todoList.filter(filter);
       }).filter (item => item); // remove undefined
 
       this.setState({ filter, items, currentList});
