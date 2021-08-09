@@ -208,7 +208,16 @@ class App extends React.Component {
   }
 
   static deleteListFromLocalStorage(id) {
-    window.localStorage.removeItem(id);
+    // Delete list data.
+    const key = LocalStoragePaths.ListDataPrefix + "::"+ id;
+    window.localStorage.removeItem(key)
+
+    // Delete list from ids.
+    App.storagekeys.delete(id);
+
+    const storagekeysArray = Array.from(App.storagekeys);
+    window.localStorage.setItem(LocalStoragePaths.ListIds,
+                                JSON.stringify(storagekeysArray));
   }
 
   getDefaultTodoList() {
@@ -221,13 +230,18 @@ class App extends React.Component {
 
   createTodoList() {
     const defaultName = "New List";
+    const userDefinedName = prompt("Enter a name for the list", defaultName);
+    const name = userDefinedName ? userDefinedName : defaultName;
+
     // Generate a unique identifier.
     const newId = UUID();
-    const newList = new Todos(newId);
+    const newList = new Todos(newId, name);
 
     this.todos.set(newId, newList);
     App.addNewListToLocalStorage(newId);
-    this.loadItems();
+
+    // switch to new list
+    this.loadItems(undefined, newId);
   }
 
   deleteTodoList(id) {
@@ -237,10 +251,12 @@ class App extends React.Component {
 
     // If we removed the list we were currently viewing,
     // switch to watching the "All" list.
-    this.setState({currentList: LocalStoragePaths.DefaultListId});
-
-    // Update the items.
-    this.loadItems();
+    if (this.state.currentList === id) {
+      this.loadItems(undefined, LocalStoragePaths.DefaultListId);
+    } else {
+      // Otherwise, just update the items.
+      this.loadItems();
+    }
   }
 
   switchToList(listId) {
@@ -253,7 +269,7 @@ class App extends React.Component {
   }
 
   renameTodoList(id, name) {
-    this.todos.get(id).name = name;
+    this.todos.get(id).setName(name);
     this.loadItems();
   }
 

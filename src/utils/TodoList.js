@@ -24,8 +24,9 @@ export default class TodoList {
     return this.name;
   }
 
-  setName(name) {
+  setName(newName) {
     this.name = newName;
+    this.save();
   }
 
   load() {
