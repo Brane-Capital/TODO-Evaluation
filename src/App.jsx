@@ -160,6 +160,7 @@ class App extends React.Component {
     // Setup class data bindings.
     this.createTodoList = this.createTodoList.bind(this);
     this.deleteTodoList = this.deleteTodoList.bind(this);
+    this.renameTodoList = this.renameTodoList.bind(this);
 
     // Load list keys from the localstorage.
     App.loadListKeys();
@@ -251,6 +252,11 @@ class App extends React.Component {
     return this.todos.get(id);
   }
 
+  renameTodoList(id, name) {
+    this.todos.get(id).name = name;
+    this.loadItems();
+  }
+
   loadItems(filter, newCurrentList) {
     // TODO: clean up code.
 
@@ -312,6 +318,7 @@ class App extends React.Component {
       }
     }
   };
+
 
   toggle = todo => {
     return () => {
@@ -377,6 +384,7 @@ class App extends React.Component {
                        isSelected={isCurrentList}
                        switchToList={() => this.switchToList(list.id)}
                        deleteHandler={() => {this.deleteTodoList(list.id)}}
+                       setName={(name) => this.renameTodoList(list.id, name)}
                      />
               
             })}

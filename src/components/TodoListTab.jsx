@@ -13,10 +13,17 @@ function DeleteButton(props) {
 
 function TodoListTab (props) {
 
-  const { list, isSelected, deleteHandler } = props;
+  const { list, isSelected, deleteHandler, setName } = props;
   const className = isSelected ? "active" : ""
 
-  return (<Row className={className}>
+  const rename = React.useCallback(() => {
+    const newName = prompt("Enter a name for the list", list.name);
+    if (newName) {
+      setName(newName);
+    }
+  }, [list, setName])
+
+  return (<Row className={className} onDoubleClick={rename}>
             <h3 onClick={(e) => {
                   e.preventDefault();
                   props.switchToList();

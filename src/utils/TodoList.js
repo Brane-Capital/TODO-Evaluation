@@ -24,6 +24,10 @@ export default class TodoList {
     return this.name;
   }
 
+  setName(name) {
+    this.name = newName;
+  }
+
   load() {
     const data = window.localStorage.getItem(this.storagekey);
     if (data != null) {
