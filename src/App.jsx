@@ -7,7 +7,8 @@ import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
 import { Row } from "./components/FlexboxGrid.jsx";
-import AddButton from "./components/AddButton.jsx";
+import DeleteButton from "./components/DeleteButton.jsx";
+import TodoListTab from "./components/TodoListTab.jsx";
 import UUID from "./utils/UUID.js"
 import { LocalStoragePaths } from "./utils/constants.js";
 
@@ -103,8 +104,27 @@ const TodoList = styled.ul`
 `;
 
 const TodoListPanel = styled(Row)`
+
+  div {
+    height: 2rem;
+  }
+
   h3 {
 		margin: 0.3rem;
+  }
+
+  .active {
+    border-style: outset
+  }
+
+  .add-button {
+		position: relative;
+  }
+
+  .delete-button { 
+    font-size: 1.2rem;
+    margin-left: 0.2rem;
+    margin-right: 0.2rem;
   }
 `;
 
@@ -139,6 +159,7 @@ class App extends React.Component {
 
     // Setup class data bindings.
     this.createTodoList = this.createTodoList.bind(this);
+    this.deleteTodoList = this.deleteTodoList.bind(this);
 
     // Load list keys from the localstorage.
     App.loadListKeys();
@@ -185,6 +206,10 @@ class App extends React.Component {
     }
   }
 
+  static deleteListFromLocalStorage(id) {
+    window.localStorage.removeItem(id);
+  }
+
   getDefaultTodoList() {
     return this.todos.get(LocalStoragePaths.DefaultListId);
   }
@@ -204,22 +229,35 @@ class App extends React.Component {
     this.loadItems();
   }
 
-  switchToList(listId) {
-    this.setState({currentList: listId});
+  deleteTodoList(id) {
+    // Remove the list.
+    this.todos.delete(id);
+    App.deleteListFromLocalStorage(id);
+
+    // If we removed the list we were currently viewing,
+    // switch to watching the "All" list.
+    this.setState({currentList: LocalStoragePaths.DefaultListId});
+
+    // Update the items.
     this.loadItems();
+  }
+
+  switchToList(listId) {
+    // filter does not need to changed.
+    this.loadItems(undefined, listId);
   }
 
   getTodoList(id) {
     return this.todos.get(id);
   }
 
-  loadItems(filter) {
+  loadItems(filter, newCurrentList) {
     // TODO: clean up code.
 
     const todoListsArray = [...this.todos.values()];
 
-    // Alias
-    const currentList = this.state.currentList;
+    // If provided, get the new filter and current list. 
+    const currentList = newCurrentList ? newCurrentList : this.state.currentList;
 
     // If there is no filter, or the filter has not changed.
     if (filter == null || filter == this.state.filter) {
@@ -235,7 +273,7 @@ class App extends React.Component {
         return todoList.filter(this.state.filter);
       }).filter(item => item); // remove undefined
 
-      this.setState({ items });
+      this.setState({ items, currentList});
 
     } else {
       // Store the new filter and apply it on the list.
@@ -251,7 +289,7 @@ class App extends React.Component {
         return todoList.filter(this.state.filter);
       }).filter (item => item); // remove undefined
 
-      this.setState({ filter, items });
+      this.setState({ filter, items, currentList});
     }
   }
 
@@ -328,11 +366,22 @@ class App extends React.Component {
         <TodoApp >
           <TodoListPanel >
             {[...this.todos.values()].map((list) => {
-              return (<h3 key={list.id}
-                          onClick={() => {this.switchToList(list.id)}}
-                      >{list.getName()}</h3>)
+              const isCurrentList = currentList === list.id;
+              const className = isCurrentList ? "active" : "";
+              const renderDeleteButton = isCurrentList && list.id !== "default";
+              console.log("classname: ", className);
+
+              return <TodoListTab
+                       key={list.id}
+                       list={list}
+                       isSelected={isCurrentList}
+                       switchToList={() => this.switchToList(list.id)}
+                       deleteHandler={() => {this.deleteTodoList(list.id)}}
+                     />
+              
             })}
-            <AddButton clickHandler={this.createTodoList} />
+            <h3 className="add-button"
+                onClick={this.createTodoList}>+</h3>
           </TodoListPanel>
           <label className="indicator">❯</label>
           <Input
