@@ -128,9 +128,6 @@ const TodoListPanel = styled(Row)`
   }
 `;
 
-// TODO: delete
-const TEST_LIST_ID="test_id"
-
 class App extends React.Component {
   state = {
     newTodo: "",
@@ -143,15 +140,12 @@ class App extends React.Component {
   };
 
   // Map todo categories to the todo list models.
-  // TODO: Rename to lists?
+  // FIXME: Rename to lists, would be a more appropriate name.
   todos = new Map();
 
 
   // Use a set to prevent duplicates.
-  // TODO: rename to listIds
-  // TODO: think about moving to its own file, or to the app jsx file
-  // maybe it makes sense for it to have its own component with the UI as well.
-  // maybe start with null here?
+  // TODO: Extract the todolists/categories logic into its own class/component.
   static storagekeys = new Set();
 
   constructor(props) {
@@ -182,7 +176,6 @@ class App extends React.Component {
       App.addNewListToLocalStorage(defaultListId);
     }
 
-    console.log(this.state)
 
   }
 
@@ -274,7 +267,7 @@ class App extends React.Component {
   }
 
   loadItems(filter, newCurrentList) {
-    // TODO: clean up code.
+    // TODO: Remove code duplication.
 
     const todoListsArray = [...this.todos.values()];
 
@@ -321,8 +314,6 @@ class App extends React.Component {
 
   newTodoKeyDown = event => {
     if (event.keyCode == KeyCode.Enter) {
-      // TODO: Remove
-      console.log("prevent default");
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
@@ -373,15 +364,6 @@ class App extends React.Component {
   render() {
     const { newTodo, filter, items, currentList } = this.state;
 
-    console.log("currentList");
-    console.log(currentList)
-    console.log("items");
-    console.log(items);
-    console.log("filter");
-    console.log(filter);
-    console.log("todos");
-    console.log(this.todos);
-
     return (
       <Page>
         <GlobalStyle />
@@ -390,9 +372,6 @@ class App extends React.Component {
           <TodoListPanel >
             {[...this.todos.values()].map((list) => {
               const isCurrentList = currentList === list.id;
-              const className = isCurrentList ? "active" : "";
-              const renderDeleteButton = isCurrentList && list.id !== "default";
-              console.log("classname: ", className);
 
               return <TodoListTab
                        key={list.id}
