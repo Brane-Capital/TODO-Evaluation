@@ -6,6 +6,10 @@ import Todos from "./utils/TodoList";
 import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
+import { Row } from "./components/FlexboxGrid.jsx";
+import AddButton from "./components/AddButton.jsx";
+import UUID from "./utils/UUID.js"
+import { LocalStoragePaths } from "./utils/constants.js";
 
 const Page = styled.div`
   .info {
@@ -46,7 +50,7 @@ const TodoApp = styled.section`
 
   label.indicator {
     position: absolute;
-    top: 14px;
+    top: 40px;
     left: -8px;
     font-size: 22px;
     color: #e6e6e6;
@@ -98,6 +102,15 @@ const TodoList = styled.ul`
   }
 `;
 
+const TodoListPanel = styled(Row)`
+  h3 {
+		margin: 0.3rem;
+  }
+`;
+
+// TODO: delete
+const TEST_LIST_ID="test_id"
+
 class App extends React.Component {
   state = {
     newTodo: "",
@@ -105,13 +118,86 @@ class App extends React.Component {
     items: [],
   };
 
-  todos = new Todos();
+  // Map todo categories to the todo list models.
+  // TODO: Rename to lists?
+  todos = new Map();
+
+  // Use a set to prevent duplicates.
+  // TODO: rename to listIds
+  // TODO: think about moving to its own file, or to the app jsx file
+  // maybe it makes sense for it to have its own component with the UI as well.
+  // maybe start with null here?
+  static storagekeys = new Set();
+
+  constructor(props) {
+    super(props);
+
+    // Setup class data bindings.
+    this.createTodoList = this.createTodoList.bind(this);
+
+    // Load list keys from the localstorage.
+    App.loadListKeys();
+    const ids = App.storagekeys;
+
+    // Load lists from localStorage
+    for (let id of ids) {
+      this.todos.set(id, new Todos(id));
+
+      App.addNewListToLocalStorage(id);
+    }
+
+    // Create default list if it wasn't loaded in.
+    // This occurs on the first initialization of the application because
+    // the default list does not yet exist.
+    const defaultListId = LocalStoragePaths.DefaultListId
+    if (!ids.has(defaultListId)) {
+      this.todos.set(defaultListId, new Todos(defaultListId, "All"));
+      App.addNewListToLocalStorage(defaultListId);
+    }
+
+  }
+
+  static addNewListToLocalStorage(newListId) {
+    App.storagekeys.add(newListId);
+    // convert to an array before saving
+    const storagekeysArray = Array.from(App.storagekeys);
+    window.localStorage.setItem(LocalStoragePaths.ListIds,
+                                JSON.stringify(storagekeysArray));
+  }
+
+  static loadListKeys() {
+    const loaded = JSON.parse(
+      window.localStorage.getItem(LocalStoragePaths.ListIds));
+
+    if (loaded) {
+      // convert from array back to set.
+      App.storagekeys = new Set(loaded);
+      return loaded;
+    } else {
+      App.storagekeys = new Set();
+    }
+  }
+
+  getDefaultTodoList() {
+    return this.todos.get(LocalStoragePaths.DefaultListId);
+  }
+
+  createTodoList() {
+    const defaultName = "New List";
+    // Generate a unique identifier.
+    const newId = UUID();
+    const newList = new Todos(newId);
+
+    this.todos.set(newId, newList);
+    App.addNewListToLocalStorage(newId);
+    this.loadItems();
+  }
 
   loadItems(filter) {
     if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.todos.filter(this.state.filter) });
+      this.setState({ items: this.getDefaultTodoList().filter(this.state.filter) });
     } else {
-      this.setState({ filter, items: this.todos.filter(filter) });
+      this.setState({ filter, items: this.getDefaultTodoList().filter(filter) });
     }
   }
 
@@ -121,10 +207,12 @@ class App extends React.Component {
 
   newTodoKeyDown = event => {
     if (event.keyCode == KeyCode.Enter) {
+      // TODO: Remove
+      console.log("prevent default");
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.todos.add(title);
+        this.getDefaultTodoList().add(title);
         this.setState({ newTodo: "" });
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
@@ -135,21 +223,21 @@ class App extends React.Component {
 
   toggle = todo => {
     return () => {
-      this.todos.toggle(todo);
+      this.getDefaultTodoList().toggle(todo);
       this.loadItems();
     };
   };
 
   update = todo => {
     return newName => {
-      this.todos.rename(todo.id, newName);
+      this.getDefaultTodoList().rename(todo.id, newName);
       this.loadItems();
     };
   };
 
   destroy = todo => {
     return () => {
-      this.todos.delete(todo);
+      this.getDefaultTodoList().delete(todo);
       this.loadItems();
     };
   };
@@ -169,11 +257,18 @@ class App extends React.Component {
 
   render() {
     const { newTodo, filter, items } = this.state;
+
     return (
       <Page>
         <GlobalStyle />
         <Title>todos</Title>
-        <TodoApp>
+        <TodoApp >
+          <TodoListPanel >
+            {[...this.todos.values()].map((list) => {
+              return (<h3 key={list.id} >{list.getName()}</h3>)
+            })}
+            <AddButton clickHandler={this.createTodoList} />
+          </TodoListPanel>
           <label className="indicator">❯</label>
           <Input
             placeholder="What needs to be done?"

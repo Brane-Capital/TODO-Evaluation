@@ -1,16 +1,35 @@
 import _ from "lodash";
-
-const storagekey = "todos::data";
+import { LocalStoragePaths } from "./constants.js";
 
 export default class TodoList {
-  constructor() {
+  // Initialized in the constructor because the props are needed.
+
+  // Props: id string 
+  constructor(id, name) {
+    this.id = id;
+    // TODO: move it to the load and save functions, or use a helper func.
+    this.storagekey = LocalStoragePaths.ListDataPrefix + "::"+ id;
+
+
+    this.name = name ? name : "New List";
+
     this.load();
+
+    // Save the name.
+    this.save();
+  }
+
+
+  getName() {
+    return this.name;
   }
 
   load() {
-    const data = window.localStorage.getItem(storagekey);
+    const data = window.localStorage.getItem(this.storagekey);
     if (data != null) {
-      this.items = JSON.parse(data);
+      const parsed = JSON.parse(data);
+      this.name = parsed.name;
+      this.items = parsed.items;
     } else {
       this.items = [];
     }
@@ -18,7 +37,10 @@ export default class TodoList {
   }
 
   save() {
-    window.localStorage.setItem(storagekey, JSON.stringify(this.items));
+    window.localStorage.setItem(this.storagekey, JSON.stringify({
+      name: this.name,
+      items: this.items
+    }));
   }
 
   newId() {
