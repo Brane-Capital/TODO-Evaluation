@@ -51,6 +51,8 @@ export default class TodoList {
   add(name) {
     const item = {
       id: this.newId(),
+      // Needed to provide a 2-way binding.
+      listId: this.id,
       name,
       completed: false,
       createdAt: Date.now(),

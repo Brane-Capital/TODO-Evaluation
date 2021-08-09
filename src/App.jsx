@@ -205,24 +205,21 @@ class App extends React.Component {
   }
 
   switchToList(listId) {
-    this.loadItems(null, listId);
+    this.setState({currentList: listId});
+    this.loadItems();
   }
 
-  loadItems(filter, currentList) {
+  getTodoList(id) {
+    return this.todos.get(id);
+  }
+
+  loadItems(filter) {
     // TODO: clean up code.
 
     const todoListsArray = [...this.todos.values()];
 
-    // If there is a new list, use that.
-    // If the list is the same use that.
-    // If there is no list specified, set null
-    // to signal using the "All list".
-    const listIdFilter = currentList ? currentList :
-          (this.state.currentList ? this.state.currentList : null)
-
-    if (currentList !== this.state.currentList) {
-      this.setState({currentList});
-    }
+    // Alias
+    const currentList = this.state.currentList;
 
     // If there is no filter, or the filter has not changed.
     if (filter == null || filter == this.state.filter) {
@@ -231,7 +228,7 @@ class App extends React.Component {
       // iterating over all lists and applying the filter
       // and collecting the resulting todo items.
       const items = todoListsArray.flatMap((todoList) => {
-        if (listIdFilter && todoList.id !== listIdFilter) {
+        if (currentList !== "default" && currentList !== todoList.id) {
           return;
         }
 
@@ -247,7 +244,7 @@ class App extends React.Component {
       // iterating over all lists and applying the filter
       // and collecting the resulting todo items.
       const items = todoListsArray.flatMap((todoList) => {
-        if (listIdFilter && todoList.id !== listIdFilter) {
+        if (currentList !== "default" && currentList !== todoList.id) {
           return;
         }
 
@@ -280,21 +277,21 @@ class App extends React.Component {
 
   toggle = todo => {
     return () => {
-      this.getCurrentTodoList().toggle(todo);
+      this.getTodoList(todo.listId).toggle(todo);
       this.loadItems();
     };
   };
 
   update = todo => {
     return newName => {
-      this.getCurrentTodoList().rename(todo.id, newName);
+      this.getTodoList(todo.listId).rename(todo.id, newName);
       this.loadItems();
     };
   };
 
   destroy = todo => {
     return () => {
-      this.getCurrentTodoList().delete(todo);
+      this.getTodoList(todo.listId).delete(todo);
       this.loadItems();
     };
   };
