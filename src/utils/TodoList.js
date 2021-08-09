@@ -7,7 +7,6 @@ export default class TodoList {
   // Props: id string 
   constructor(id, name) {
     this.id = id;
-    // TODO: move it to the load and save functions, or use a helper func.
     this.storagekey = LocalStoragePaths.ListDataPrefix + "::"+ id;
 
 
