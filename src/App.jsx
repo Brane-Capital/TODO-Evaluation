@@ -116,16 +116,16 @@ class App extends React.Component {
     newTodo: "",
     filter: getHashPath() || "active",
     items: [],
+    // The default list will contain all todos that were added from the
+    // "All" tab. All itself is a virtual list that is created by
+    // merging the todo items of all localStorage backed lists.
+    currentList: "default"
   };
 
   // Map todo categories to the todo list models.
   // TODO: Rename to lists?
   todos = new Map();
 
-  // The default list will contain all todos that were added from the
-  // "All" tab. All itself is a virtual list that is created by
-  // merging the todo items of all localStorage backed lists.
-  currentList = "default";
 
   // Use a set to prevent duplicates.
   // TODO: rename to listIds
@@ -189,6 +189,10 @@ class App extends React.Component {
     return this.todos.get(LocalStoragePaths.DefaultListId);
   }
 
+  getCurrentTodoList() {
+    return this.todos.get(this.state.currentList);
+  }
+
   createTodoList() {
     const defaultName = "New List";
     // Generate a unique identifier.
@@ -215,6 +219,10 @@ class App extends React.Component {
     // to signal using the "All list".
     const listIdFilter = currentList ? currentList :
           (this.state.currentList ? this.state.currentList : null)
+
+    if (currentList !== this.state.currentList) {
+      this.setState({currentList});
+    }
 
     // If there is no filter, or the filter has not changed.
     if (filter == null || filter == this.state.filter) {
@@ -261,7 +269,7 @@ class App extends React.Component {
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.getDefaultTodoList().add(title);
+        this.getCurrentTodoList().add(title);
         this.setState({ newTodo: "" });
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
@@ -272,21 +280,21 @@ class App extends React.Component {
 
   toggle = todo => {
     return () => {
-      this.getDefaultTodoList().toggle(todo);
+      this.getCurrentTodoList().toggle(todo);
       this.loadItems();
     };
   };
 
   update = todo => {
     return newName => {
-      this.getDefaultTodoList().rename(todo.id, newName);
+      this.getCurrentTodoList().rename(todo.id, newName);
       this.loadItems();
     };
   };
 
   destroy = todo => {
     return () => {
-      this.getDefaultTodoList().delete(todo);
+      this.getCurrentTodoList().delete(todo);
       this.loadItems();
     };
   };
@@ -305,8 +313,10 @@ class App extends React.Component {
   }
 
   render() {
-    const { newTodo, filter, items } = this.state;
+    const { newTodo, filter, items, currentList } = this.state;
 
+    console.log("currentList");
+    console.log(currentList)
     console.log("items");
     console.log(items);
     console.log("filter");
