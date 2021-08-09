@@ -122,6 +122,11 @@ class App extends React.Component {
   // TODO: Rename to lists?
   todos = new Map();
 
+  // The default list will contain all todos that were added from the
+  // "All" tab. All itself is a virtual list that is created by
+  // merging the todo items of all localStorage backed lists.
+  currentList = "default";
+
   // Use a set to prevent duplicates.
   // TODO: rename to listIds
   // TODO: think about moving to its own file, or to the app jsx file
@@ -154,6 +159,8 @@ class App extends React.Component {
       this.todos.set(defaultListId, new Todos(defaultListId, "All"));
       App.addNewListToLocalStorage(defaultListId);
     }
+
+    console.log(this.state)
 
   }
 
@@ -193,11 +200,53 @@ class App extends React.Component {
     this.loadItems();
   }
 
-  loadItems(filter) {
+  switchToList(listId) {
+    this.loadItems(null, listId);
+  }
+
+  loadItems(filter, currentList) {
+    // TODO: clean up code.
+
+    const todoListsArray = [...this.todos.values()];
+
+    // If there is a new list, use that.
+    // If the list is the same use that.
+    // If there is no list specified, set null
+    // to signal using the "All list".
+    const listIdFilter = currentList ? currentList :
+          (this.state.currentList ? this.state.currentList : null)
+
+    // If there is no filter, or the filter has not changed.
     if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.getDefaultTodoList().filter(this.state.filter) });
+
+      // Show the "All" virtual list, by:
+      // iterating over all lists and applying the filter
+      // and collecting the resulting todo items.
+      const items = todoListsArray.flatMap((todoList) => {
+        if (listIdFilter && todoList.id !== listIdFilter) {
+          return;
+        }
+
+        return todoList.filter(this.state.filter);
+      }).filter(item => item); // remove undefined
+
+      this.setState({ items });
+
     } else {
-      this.setState({ filter, items: this.getDefaultTodoList().filter(filter) });
+      // Store the new filter and apply it on the list.
+
+      // Show the "All" virtual list, by:
+      // iterating over all lists and applying the filter
+      // and collecting the resulting todo items.
+      const items = todoListsArray.flatMap((todoList) => {
+        if (listIdFilter && todoList.id !== listIdFilter) {
+          return;
+        }
+
+        return todoList.filter(this.state.filter);
+      }).filter (item => item); // remove undefined
+
+      this.setState({ filter, items });
     }
   }
 
@@ -258,6 +307,13 @@ class App extends React.Component {
   render() {
     const { newTodo, filter, items } = this.state;
 
+    console.log("items");
+    console.log(items);
+    console.log("filter");
+    console.log(filter);
+    console.log("todos");
+    console.log(this.todos);
+
     return (
       <Page>
         <GlobalStyle />
@@ -265,7 +321,9 @@ class App extends React.Component {
         <TodoApp >
           <TodoListPanel >
             {[...this.todos.values()].map((list) => {
-              return (<h3 key={list.id} >{list.getName()}</h3>)
+              return (<h3 key={list.id}
+                          onClick={() => {this.switchToList(list.id)}}
+                      >{list.getName()}</h3>)
             })}
             <AddButton clickHandler={this.createTodoList} />
           </TodoListPanel>
