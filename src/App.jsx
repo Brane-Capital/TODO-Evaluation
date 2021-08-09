@@ -7,7 +7,6 @@ import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
 import { Row } from "./components/FlexboxGrid.jsx";
-import DeleteButton from "./components/DeleteButton.jsx";
 import TodoListTab from "./components/TodoListTab.jsx";
 import UUID from "./utils/UUID.js"
 import { LocalStoragePaths } from "./utils/constants.js";
