@@ -6,6 +6,10 @@ import Todos from "./utils/TodoList";
 import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
+import Tab from "./components/Tab";
+
+const tabKey = "tabs::data";
+const todoKey = "todos::data";
 
 const Page = styled.div`
   .info {
@@ -46,7 +50,7 @@ const TodoApp = styled.section`
 
   label.indicator {
     position: absolute;
-    top: 14px;
+    top: 65px;
     left: -8px;
     font-size: 22px;
     color: #e6e6e6;
@@ -97,69 +101,107 @@ const TodoList = styled.ul`
     border-bottom: none;
   }
 `;
+const TabContainer = styled.div`
+  cursor: pointer;
+  color: #5ea4f3;
+  border-bottom: 1px solid #d6d6d6;
+`;
 
 class App extends React.Component {
   state = {
     newTodo: "",
     filter: getHashPath() || "active",
+    tabId: 0,
+    tabs: [],
     items: [],
   };
 
-  todos = new Todos();
+  todos = new Todos(todoKey);
+  tabs = new Todos(tabKey);
 
-  loadItems(filter) {
-    if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.todos.filter(this.state.filter) });
-    } else {
-      this.setState({ filter, items: this.todos.filter(filter) });
-    }
+  loadItems(filter, tabId) {
+    this.setState({
+      items: this.todos.filter(filter, tabId),
+    });
   }
 
-  inputText = event => {
+  inputText = (event) => {
     this.setState({ newTodo: event.target.value });
   };
-
-  newTodoKeyDown = event => {
+  newTodoKeyDown = (event) => {
     if (event.keyCode == KeyCode.Enter) {
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.todos.add(title);
+        this.todos.add(title, this.state.tabId);
         this.setState({ newTodo: "" });
-        const filter =
-          this.state.filter == "completed" ? "active" : this.state.filter;
-        this.loadItems(filter);
+        this.loadItems(this.state.filter, this.state.tabId);
       }
     }
   };
+  loadTabsHandler = () => {
+    this.setState({
+      tabs: this.tabs.items,
+    });
+  };
+  selectTab = (tabId) => {
+    this.setState({ tabId: tabId }, () =>
+      this.loadItems(this.state.filter, this.state.tabId)
+    );
+  };
+  newTabHandler = () => {
+    const name = "New List";
+    this.tabs.add(name);
+    this.loadTabsHandler();
+  };
+  deleteTab = (id) => {
+    if (id === this.state.tabId) {
+      const prevTab = this.tabs.items[id - 1];
+      this.selectTab(prevTab === undefined ? 0 : prevTab);
+    }
+    this.tabs.deleteTabItems(id);
+    this.todos.deleteTab(id);
+    this.loadTabsHandler();
+  };
+  renameTabHandler = (tabId, newName) => {
+    this.tabs.rename(tabId, newName);
+    this.loadTabsHandler();
+  };
 
-  toggle = todo => {
+  toggle = (todo) => {
     return () => {
       this.todos.toggle(todo);
-      this.loadItems();
+      this.loadItems(this.state.filter, this.state.tabId);
     };
   };
 
-  update = todo => {
-    return newName => {
+  update = (todo) => {
+    return (newName) => {
       this.todos.rename(todo.id, newName);
-      this.loadItems();
+      this.loadItems(this.state.filter, this.state.tabId);
     };
   };
 
-  destroy = todo => {
+  destroy = (todo) => {
     return () => {
       this.todos.delete(todo);
-      this.loadItems();
+      this.loadItems(this.state.filter, this.state.tabId);
     };
   };
 
   hashchange = () => {
-    this.loadItems(getHashPath());
+    const filter = getHashPath();
+    this.setState(
+      {
+        filter: filter,
+      },
+      () => this.loadItems(filter, this.state.tabId)
+    );
   };
 
   componentDidMount() {
-    this.loadItems();
+    this.loadItems(this.state.filter, this.state.tabId);
+    this.loadTabsHandler();
     window.addEventListener("hashchange", this.hashchange);
   }
 
@@ -175,6 +217,31 @@ class App extends React.Component {
         <Title>todos</Title>
         <TodoApp>
           <label className="indicator">❯</label>
+          <TabContainer>
+            <Tab
+              label={"All"}
+              isSelected={this.state.tabId === 0}
+              onClick={() => this.selectTab(0)}
+              editable={false}
+            />
+            {this.state.tabs.map(({ name, id }) => {
+              return (
+                <Tab
+                  key={id}
+                  label={name}
+                  isSelected={this.state.tabId === id}
+                  onClick={() => this.selectTab(id)}
+                  editable={true}
+                  onDelete={(e) => {
+                    e.stopPropagation();
+                    this.deleteTab(id);
+                  }}
+                  onUpdate={(name) => this.renameTabHandler(id, name)}
+                />
+              );
+            })}
+            <Tab label="+" onClick={this.newTabHandler} editable={false} />
+          </TabContainer>
           <Input
             placeholder="What needs to be done?"
             value={newTodo}
