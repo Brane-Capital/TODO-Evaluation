@@ -3,22 +3,35 @@ import _ from "lodash";
 const storagekey = "todos::data";
 
 export default class TodoList {
-  constructor() {
+  constructor(id) {
+    this.id = id;
     this.load();
   }
 
   load() {
-    const data = window.localStorage.getItem(storagekey);
+    const data = window.localStorage.getItem(storagekey + this.id);
     if (data != null) {
-      this.items = JSON.parse(data);
+      let savedData = JSON.parse(data);
+      this.label = savedData.label;
+      this.items = savedData.items;
     } else {
       this.items = [];
+      this.label = 'New List';
+      this.selected = false;
+      this.editing = true;
     }
     this.maxId = _.isEmpty(this.items) ? 0 : _.maxBy(this.items, "id").id;
   }
 
   save() {
-    window.localStorage.setItem(storagekey, JSON.stringify(this.items));
+    const data = {
+      label: this.label,
+      items: this.items
+    };
+    window.localStorage.setItem(storagekey + this.id, JSON.stringify(data));
+  }
+  deleteList() {
+    window.localStorage.removeItem(storagekey + this.id);
   }
 
   newId() {

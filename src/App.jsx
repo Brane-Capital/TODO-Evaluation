@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { KeyCode } from "./utils/constants";
 import { getHashPath } from "./utils/pageAddress";
 import Todos from "./utils/TodoList";
+import List from "./utils/Lists";
 import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
@@ -98,20 +99,53 @@ const TodoList = styled.ul`
   }
 `;
 
+const Tabs = styled.div`
+  display: flex;
+  justify-content: start;
+  background: #fff;
+  position: relative;
+  .selected {
+    background: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+    border-bottom: none;
+    border-radius: 5px 5px 0px 0px;
+  }
+`
+const Tab = styled.div`
+  display: flex;
+  justify-content: start;
+  padding: 1rem;
+  color: #0000EE;
+  .delete {
+    color: red;
+    padding-left: 1rem;
+  }
+`
+const TabEdit = styled.input`
+  position: relative;
+  margin: 0;
+  width: 2rem;
+  font-family: inherit;
+  font-weight: inherit;
+  color: black;
+  border: none;
+  background: rgba(0, 0, 0, 0.003);
+  box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
+`;
+
 class App extends React.Component {
+  lists = new List();
   state = {
     newTodo: "",
     filter: getHashPath() || "active",
-    items: [],
+    lists: this.lists,
   };
-
-  todos = new Todos();
 
   loadItems(filter) {
     if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.todos.filter(this.state.filter) });
+      this.setState({ lists: this.lists });
     } else {
-      this.setState({ filter, items: this.todos.filter(filter) });
+      this.setState({ filter, lists: this.lists });
     }
   }
 
@@ -119,12 +153,22 @@ class App extends React.Component {
     this.setState({ newTodo: event.target.value });
   };
 
+  removeList = id => {
+    return () => {
+      this.lists.remove(id);
+      if (!this.lists.getSelected()) {
+        this.lists.lists[0].selected = true;
+      }
+      this.setState({ lists: this.lists });
+    };
+  }
+
   newTodoKeyDown = event => {
     if (event.keyCode == KeyCode.Enter) {
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.todos.add(title);
+        this.lists.addItem(title);
         this.setState({ newTodo: "" });
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
@@ -133,27 +177,70 @@ class App extends React.Component {
     }
   };
 
-  toggle = todo => {
+  toggle = (todo) => {
     return () => {
-      this.todos.toggle(todo);
+      this.lists.toggle(todo);
       this.loadItems();
     };
   };
 
   update = todo => {
     return newName => {
-      this.todos.rename(todo.id, newName);
+      this.lists.renameItem(todo.id, newName);
       this.loadItems();
     };
   };
+
+  enableEdit = id => {
+    return () => {
+      this.lists.get(id).editing = true;
+      this.setState({ lists: this.lists });
+    }
+  }
+  completeEdit = id => {
+    return event => {
+      if (event.keyCode == KeyCode.Enter) {
+        event.preventDefault();
+        this.lists.get(id).editing = false;
+        this.setState({ lists: this.lists });
+      }
+    }
+  }
+  setListLabel = (id) => {
+    return event => {
+      this.lists.get(id).label = event.target.value;
+      this.setState({ lists: this.lists });
+    };
+  };
+
+  addEmptyList = () => {
+    this.lists.getSelected().selected = false;
+    this.lists.lists.forEach(list => {
+      if (list.selected == true) {
+        list.selected = false;
+      }
+    });
+    const emptyList = new Todos(this.lists.newId());
+    emptyList.selected = true;
+    emptyList.editing = true;
+
+    this.lists.add(emptyList);
+    this.setState({ lists: this.lists });
+  }
 
   destroy = todo => {
     return () => {
-      this.todos.delete(todo);
+      this.lists.deleteToDo(todo);
       this.loadItems();
     };
   };
 
+  select = listId => {
+    return () => {
+      this.lists.select(listId);
+      this.setState({ lists: this.lists });
+    }
+  }
   hashchange = () => {
     this.loadItems(getHashPath());
   };
@@ -168,11 +255,23 @@ class App extends React.Component {
   }
 
   render() {
-    const { newTodo, filter, items } = this.state;
+    const { newTodo, filter, lists } = this.state;
     return (
       <Page>
         <GlobalStyle />
         <Title>todos</Title>
+        <Tabs>{
+          lists.getAll().map(list => (
+            <Tab key={list.id} className={list.selected ? 'selected' : ''}>
+              <div hidden={list.editing} onClick={this.select(list.id)}>
+                <span onDoubleClick={this.enableEdit(list.id, true)}>{list.label}</span>
+              </div>
+              <TabEdit hidden={!list.editing} placeholder={list.label} onChange={this.setListLabel(list.id)} onKeyDown={this.completeEdit(list.id)} />
+              <span className="delete" hidden={!list.selected || list.id === 0 || list.editing} onClick={this.removeList(list.id)}>x</span>
+            </Tab>
+          ))}
+          <Tab key="-1" onClick={this.addEmptyList}>+</Tab>
+        </Tabs>
         <TodoApp>
           <label className="indicator">❯</label>
           <Input
@@ -183,7 +282,7 @@ class App extends React.Component {
             autoFocus={true}
           />
           <TodoList>
-            {items.map((todo, index) => (
+            {lists.getSelected().filter(filter).map((todo, index) => (
               <TodoItem
                 key={index}
                 todo={todo}
@@ -194,7 +293,7 @@ class App extends React.Component {
               />
             ))}
           </TodoList>
-          <Footer filter={filter} itemCount={items.length} />
+          <Footer filter={filter} itemCount={lists.getSelected().filter(filter).length} />
         </TodoApp>
         <footer className="info">
           <p>Double-click to edit a todo</p>
@@ -202,7 +301,7 @@ class App extends React.Component {
             An adaptation of <a href="http://todomvc.com">TodoMVC</a>
           </p>
         </footer>
-      </Page>
+      </Page >
     );
   }
 }
