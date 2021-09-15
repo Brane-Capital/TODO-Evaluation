@@ -26,10 +26,11 @@ export default class TodoList {
     return this.maxId;
   }
 
-  add(name) {
+  add(name, tab_id) {
     const item = {
       id: this.newId(),
       name,
+      tab: tab_id,
       completed: false,
       createdAt: Date.now(),
     };
@@ -42,8 +43,13 @@ export default class TodoList {
     this.save();
   }
 
-  toggle(todo) {
-    let item = _.find(this.items, it => it.id == todo.id);
+  deleteByTab(tab_id) {
+    this.items = this.items.filter(item => item.tab !== tab_id);
+    this.save();
+  }
+
+  toggle(todo, tab_id) {
+    let item = _.find(this.items, it => it.id === todo.id && it.tab === tab_id);
     if (item) {
       item.completed = !item.completed;
       if (item.completed) {
@@ -53,23 +59,23 @@ export default class TodoList {
     }
   }
 
-  rename(id, newName) {
-    let item = _.find(this.items, it => it.id == id);
+  rename(id, newName, tab_id) {
+    let item = _.find(this.items, it => it.id === id && it.tab === tab_id);
     if (item) {
       item.name = newName;
       this.save();
     }
   }
 
-  filter(status) {
+  filter(status, tab_id) {
     switch (status) {
       case "active":
-        return this.items.filter(item => item.completed == false);
+        return (tab_id !== 0) ? this.items.filter(item => item.completed === false && item.tab === tab_id) : this.items.filter(item => item.completed === false);
       case "completed":
-        return this.items.filter(item => item.completed == true);
+        return (tab_id !== 0) ? this.items.filter(item => item.completed === true && item.tab === tab_id) : this.items.filter(item => item.completed === false);
       case "all":
       default:
-        return this.items;
+        return (tab_id !== 0) ? this.items.filter(item => item.tab === tab_id) : this.items.filter(item => item.completed === false);
     }
   }
 }

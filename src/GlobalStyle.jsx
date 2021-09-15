@@ -54,6 +54,16 @@ input {
 :focus {
 	outline: 0;
 }
+
+.tab-list-active {
+  background-color: white;
+  border: solid #ccc;
+  border-width: 1px 1px 0 1px;
+}
+
+.dis-flex {
+	display: flex;
+}
 `;
 
 export default GlobalStyle;

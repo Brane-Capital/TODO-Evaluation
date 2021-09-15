@@ -2,10 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { KeyCode } from "./utils/constants";
 import { getHashPath } from "./utils/pageAddress";
+import Tabs from "./utils/TabList";
 import Todos from "./utils/TodoList";
 import GlobalStyle from "./GlobalStyle";
 import TodoItem from "./TodoItem";
 import Footer from "./Footer";
+import Tab from "./components/Tab";
 
 const Page = styled.div`
   .info {
@@ -46,7 +48,7 @@ const TodoApp = styled.section`
 
   label.indicator {
     position: absolute;
-    top: 14px;
+    top: 58px;
     left: -8px;
     font-size: 22px;
     color: #e6e6e6;
@@ -98,21 +100,41 @@ const TodoList = styled.ul`
   }
 `;
 
+const TabList = styled.div`
+  border: solid #ccc;
+  border-width: 0 0 1px 0;
+  padding: 10px 10px 0 10px;
+`;
+
+const AddTabButton = styled.button`
+  cursor: pointer;
+  color: dodgerblue;
+  padding: 0 10px;
+  :focus {
+    outline: none;
+  }
+`;
+
 class App extends React.Component {
   state = {
     newTodo: "",
     filter: getHashPath() || "active",
-    items: [],
+    todo_items: [],
+    tab_items:[],
+    editTabMode: false,
+    activeTab: { id: 0, name: "All" }
   };
 
+  tabs = new Tabs();
   todos = new Todos();
 
   loadItems(filter) {
     if (filter == null || filter == this.state.filter) {
-      this.setState({ items: this.todos.filter(this.state.filter) });
+      this.setState({ todo_items: this.todos.filter(this.state.filter, this.state.activeTab.id) });
     } else {
-      this.setState({ filter, items: this.todos.filter(filter) });
+      this.setState({ filter, todo_items: this.todos.filter(filter, this.state.activeTab.id) });
     }
+    this.setState({ tab_items: this.tabs.filter() });
   }
 
   inputText = event => {
@@ -124,7 +146,7 @@ class App extends React.Component {
       event.preventDefault();
       var title = this.state.newTodo.trim();
       if (title) {
-        this.todos.add(title);
+        this.todos.add(title, this.state.activeTab.id);
         this.setState({ newTodo: "" });
         const filter =
           this.state.filter == "completed" ? "active" : this.state.filter;
@@ -135,14 +157,14 @@ class App extends React.Component {
 
   toggle = todo => {
     return () => {
-      this.todos.toggle(todo);
+      this.todos.toggle(todo, this.state.activeTab.id);
       this.loadItems();
     };
   };
 
   update = todo => {
     return newName => {
-      this.todos.rename(todo.id, newName);
+      this.todos.rename(todo.id, newName, this.state.activeTab.id);
       this.loadItems();
     };
   };
@@ -158,6 +180,28 @@ class App extends React.Component {
     this.loadItems(getHashPath());
   };
 
+  onClickTab = (tab) => {
+    this.setState({ activeTab: tab });
+    this.setState({ todo_items: this.todos.filter(this.state.filter, tab.id) });
+  };
+
+  onDeleteTab = () => {
+    this.tabs.delete(this.state.activeTab.id);
+    this.todos.deleteByTab(this.state.activeTab.id);
+    this.setState({activeTab: { id: 0, name: "All" }});
+    this.loadItems();
+  }
+
+  onAddTab = () => {
+    this.tabs.add();
+    this.loadItems();
+  };
+
+  onUpdateTab = (updatedName) => {
+    this.tabs.rename(this.state.activeTab.id, updatedName);
+    this.loadItems();
+  }
+
   componentDidMount() {
     this.loadItems();
     window.addEventListener("hashchange", this.hashchange);
@@ -168,12 +212,27 @@ class App extends React.Component {
   }
 
   render() {
-    const { newTodo, filter, items } = this.state;
+    const { newTodo, filter, todo_items, tab_items, activeTab } = this.state;
     return (
       <Page>
         <GlobalStyle />
         <Title>todos</Title>
         <TodoApp>
+          <TabList>
+            {
+              tab_items.map((tab, key) => (
+                <Tab
+                  key={key}
+                  tab={tab}
+                  activeTab={activeTab}
+                  onClick={() => this.onClickTab(tab)}
+                  onDelete={this.onDeleteTab}
+                  onUpdate={this.onUpdateTab}
+                />
+              ))
+            }
+            <AddTabButton onClick={this.onAddTab}>+</AddTabButton>
+          </TabList>
           <label className="indicator">❯</label>
           <Input
             placeholder="What needs to be done?"
@@ -183,7 +242,7 @@ class App extends React.Component {
             autoFocus={true}
           />
           <TodoList>
-            {items.map((todo, index) => (
+            {todo_items.map((todo, index) => (
               <TodoItem
                 key={index}
                 todo={todo}
@@ -194,7 +253,7 @@ class App extends React.Component {
               />
             ))}
           </TodoList>
-          <Footer filter={filter} itemCount={items.length} />
+          <Footer filter={filter} itemCount={todo_items.length} />
         </TodoApp>
         <footer className="info">
           <p>Double-click to edit a todo</p>
